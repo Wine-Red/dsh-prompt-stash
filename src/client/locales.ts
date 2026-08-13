@@ -5,6 +5,7 @@ export const NS = "prompt-stash" as const;
 export const zh = {
   "action.stash": "暂存",
   "action.stashShortcut": "暂存（{shortcut}）",
+  "action.restoreShortcut": "恢复最新暂存（{shortcut}）",
   "action.open": "查看输入暂存，共 {count} 条",
   "action.restore": "恢复此条",
   "action.delete": "删除此条",
@@ -50,6 +51,7 @@ export type PromptStashLocaleKey = keyof typeof zh;
 export const en: LocaleDictOf<typeof NS> = {
   "action.stash": "Stash",
   "action.stashShortcut": "Stash ({shortcut})",
+  "action.restoreShortcut": "Restore latest stash ({shortcut})",
   "action.open": "View {count} stashed prompts",
   "action.restore": "Restore this prompt",
   "action.delete": "Delete this prompt",

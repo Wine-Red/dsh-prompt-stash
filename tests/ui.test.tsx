@@ -126,6 +126,44 @@ describe("prompt stash UI", () => {
     controller.dispose();
   });
 
+  it("restores the latest stash when the shortcut is pressed on an empty composer", () => {
+    let document = pushEntry(
+      emptyDocument(),
+      "s",
+      createEntry("older", 1, "older"),
+    );
+    document = pushEntry(document, "s", createEntry("latest", 2, "latest"));
+    writeDocument(window.localStorage, document);
+    const controller = new PromptStashController(window.localStorage);
+    const setDraft = vi.fn();
+    render(
+      <>
+        <textarea aria-label="Composer" />
+        <PromptStashButton
+          controller={controller}
+          sessionId="s"
+          input={inputState()}
+          inputActions={{ setDraft }}
+          t={t}
+        />
+      </>,
+    );
+
+    screen.getByRole("textbox", { name: "Composer" }).dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "s",
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    expect(setDraft).toHaveBeenCalledWith("latest");
+    expect(controller.entries("s").map((entry) => entry.text)).toEqual([
+      "older",
+    ]);
+    controller.dispose();
+  });
+
   it("records, saves, and immediately uses a custom single-key shortcut", async () => {
     const user = userEvent.setup();
     const controller = new PromptStashController(window.localStorage);

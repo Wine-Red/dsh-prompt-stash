@@ -80,9 +80,17 @@ export function PromptStashButton({
   );
   const anchorRef = useRef<HTMLDivElement>(null);
   const eligibility = useMemo(() => canStash(input), [input]);
+  const canRestoreLatest =
+    input.phase === "plain" &&
+    input.draft.length === 0 &&
+    input.imageIds.length === 0 &&
+    input.occurrences.length === 0 &&
+    controller.entries(sessionId).length > 0;
   const stashLabel = eligibility.allowed
     ? t("action.stashShortcut", { shortcut: snapshot.shortcut })
-    : t(`error.blocked.${eligibility.reason ?? "empty"}`);
+    : canRestoreLatest
+      ? t("action.restoreShortcut", { shortcut: snapshot.shortcut })
+      : t(`error.blocked.${eligibility.reason ?? "empty"}`);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
@@ -96,18 +104,11 @@ export function PromptStashButton({
         return;
       event.preventDefault();
       event.stopPropagation();
-      if (eligibility.allowed) controller.stash(sessionId, input, inputActions);
+      controller.activateShortcut(sessionId, input, inputActions);
     };
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
-  }, [
-    controller,
-    eligibility.allowed,
-    input,
-    inputActions,
-    sessionId,
-    snapshot.shortcut,
-  ]);
+  }, [controller, input, inputActions, sessionId, snapshot.shortcut]);
 
   return (
     <div

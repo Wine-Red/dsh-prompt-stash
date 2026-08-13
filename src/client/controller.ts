@@ -118,6 +118,25 @@ export class PromptStashController {
     return true;
   }
 
+  activateShortcut(
+    sessionId: string,
+    input: DshInputState,
+    actions: Pick<DshInputActions, "setDraft">,
+  ): boolean {
+    const eligibility = canStash(input);
+    if (eligibility.allowed) return this.stash(sessionId, input, actions);
+
+    const composerIsEmpty =
+      input.draft.length === 0 &&
+      input.imageIds.length === 0 &&
+      input.occurrences.length === 0;
+    if (!composerIsEmpty || input.phase !== "plain") return false;
+
+    const latest = this.entries(sessionId)[0];
+    if (latest === undefined) return false;
+    return this.restoreEmpty(sessionId, latest.id, input, actions);
+  }
+
   restoreEmpty(
     sessionId: string,
     targetId: string,

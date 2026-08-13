@@ -1,6 +1,6 @@
 {
   "name": "dsh-prompt-stash",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Local, per-session prompt stash for DeepSeek Harness Web",
   "homepage": "https://github.com/Wine-Red/dsh-prompt-stash#readme",
   "repository": {

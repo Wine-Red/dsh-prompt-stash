@@ -37,6 +37,9 @@ test("configures a single-key stash shortcut in the real plugin settings", async
   await composer.press("F8");
   await expect(composer).toHaveValue("");
   await expect(page.locator("[data-prompt-stash-dock]")).toBeVisible();
+  await composer.press("F8");
+  await expect(composer).toHaveValue("stashed by custom shortcut");
+  await expect(page.locator("[data-prompt-stash-dock]")).toHaveCount(0);
 
   await page.reload({ waitUntil: "networkidle" });
   expect(

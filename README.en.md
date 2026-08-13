@@ -36,10 +36,10 @@ Stashed prompts are collapsed by default. Expand the panel to see the creation t
 
 ### Release tarball (recommended)
 
-Download `dsh-prompt-stash-0.2.0.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
+Download `dsh-prompt-stash-0.2.1.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.0.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.1.tgz
 ```
 
 The tarball contains prebuilt artifacts, so installation-time build scripts are not required. Restart DSH Web after installation.
@@ -80,9 +80,11 @@ Uninstalling the plugin does not remove existing `dsh.promptStash.v1` data from 
 
 Successful add and delete operations do not show toast notifications. Error notifications appear only when storage or composer updates fail.
 
+Press the shortcut again while the message composer is empty to restore and pop the latest stash. Repeating this walks backward through the LIFO stack. The shortcut never restores over whitespace, images, or file references already in the composer.
+
 ### Configure the shortcut
 
-Open **Settings → Plugins → Plugin configuration → Prompt stash**, focus the shortcut field, press one key or a key combination, and save. Changes take effect immediately. The default is `Ctrl+S`; a single key such as `F8` is also supported. The shortcut only runs in the message composer. A printable single-key shortcut consumes that character's normal typing behavior.
+Open **Settings → Plugins → Plugin configuration → Prompt stash**, focus the shortcut field, press one key or a key combination, and save. Changes take effect immediately. The default is `Ctrl+S`; a single key such as `F8` is also supported. The shortcut stashes non-empty input and restores the latest stash when the composer is empty. It only runs in the message composer. A printable single-key shortcut consumes that character's normal typing behavior.
 
 ## Data and security boundaries
 

@@ -66,6 +66,62 @@ describe("PromptStashController", () => {
     controller.dispose();
   });
 
+  it("uses the shortcut to push non-empty input and pop the latest stash", () => {
+    const document = pushEntry(
+      emptyDocument(),
+      "session",
+      createEntry("older text", 1, "older"),
+    );
+    writeDocument(window.localStorage, document);
+    const controller = new PromptStashController(
+      window.localStorage,
+      () => 2,
+      () => "latest",
+    );
+    const setDraft = vi.fn();
+    expect(
+      controller.activateShortcut(
+        "session",
+        inputState({ draft: "latest text" }),
+        { setDraft },
+      ),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("");
+    expect(
+      controller.activateShortcut("session", inputState(), { setDraft }),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("latest text");
+    expect(controller.entries("session").map((entry) => entry.text)).toEqual([
+      "older text",
+    ]);
+    controller.dispose();
+  });
+
+  it("does not restore with current content, attachments, or a busy composer", () => {
+    const document = pushEntry(
+      emptyDocument(),
+      "session",
+      createEntry("stored", 1, "stored"),
+    );
+    writeDocument(window.localStorage, document);
+    const controller = new PromptStashController(window.localStorage);
+    const setDraft = vi.fn();
+
+    for (const input of [
+      inputState({ draft: " " }),
+      inputState({ imageIds: ["image" as never] }),
+      inputState({ occurrences: [{} as never] }),
+      inputState({ phase: "submitting" }),
+    ]) {
+      expect(controller.activateShortcut("session", input, { setDraft })).toBe(
+        false,
+      );
+    }
+    expect(setDraft).not.toHaveBeenCalled();
+    expect(controller.entries("session")).toHaveLength(1);
+    controller.dispose();
+  });
+
   it("never directly restores over a non-empty composer", () => {
     const document = pushEntry(
       emptyDocument(),

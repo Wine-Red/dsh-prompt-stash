@@ -36,10 +36,10 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 
 ### Release tarball（推荐）
 
-从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.0.tgz`，然后安装到 Web profile：
+从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.1.tgz`，然后安装到 Web profile：
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.0.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.1.tgz
 ```
 
 tarball 已包含构建产物，不需要允许安装期构建脚本。安装后重启 DSH Web。
@@ -80,9 +80,11 @@ dsh plugin --profile web remove dsh-prompt-stash
 
 添加或删除成功时不会弹出通知；只有存储或输入更新失败时才会显示错误提示。
 
+消息输入框为空时再次按下快捷键，会恢复并弹出最新一条暂存；连续使用即可按后进先出顺序逐条恢复。快捷键不会覆盖空白字符、图片或文件引用等当前输入。
+
 ### 配置快捷键
 
-打开“设置 → 插件 → 插件配置 → 输入暂存”，点击快捷键输入框后直接按下一个按键或组合键，再保存即可立即生效。默认快捷键为 `Ctrl+S`，也可以配置为 `F8` 等单键。快捷键只在消息输入框内生效；使用单个可打印字符会占用该字符原本的输入行为。
+打开“设置 → 插件 → 插件配置 → 输入暂存”，点击快捷键输入框后直接按下一个按键或组合键，再保存即可立即生效。默认快捷键为 `Ctrl+S`，也可以配置为 `F8` 等单键。输入非空时快捷键执行暂存，输入为空时恢复最新一条。快捷键只在消息输入框内生效；使用单个可打印字符会占用该字符原本的输入行为。
 
 ## 数据与安全边界
 
