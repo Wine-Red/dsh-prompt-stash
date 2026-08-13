@@ -4,11 +4,13 @@ import type {
   PropsRuntime,
 } from "@deepseek-ai/dsh-client-ui-slots";
 import type {} from "@deepseek-ai/dsh-client-ui-conversation/client";
+import type {} from "@deepseek-ai/dsh-client-ui-settings-plugins/client";
 import type {} from "@deepseek-ai/dsh-client-locale/client";
 import { createElement } from "react";
 import { PromptStashController } from "./controller";
 import { PromptStashButton } from "./PromptStashButton";
 import { PromptStashList } from "./PromptStashList";
+import { PromptStashSettings } from "./PromptStashSettings";
 import { en, NS, zh } from "./locales";
 import { installStyles } from "./styles";
 
@@ -21,6 +23,8 @@ export const inject = ["slots", "locale"];
 type InputLeftProps = PropsRuntime<"conversation.input.left"> &
   PropsLocale<typeof NS>;
 type InputDockProps = PropsRuntime<"conversation.input.dock"> &
+  PropsLocale<typeof NS>;
+type SettingsProps = PropsRuntime<"settings.plugin.item"> &
   PropsLocale<typeof NS>;
 
 export function apply(ctx: ClientContext): void {
@@ -58,6 +62,19 @@ export function apply(ctx: ClientContext): void {
       },
       (props: InputDockProps) =>
         createElement(PromptStashList, { ...props, controller }),
+    ),
+  );
+
+  ctx.slots.inject("settings.plugin.item", () =>
+    ctx.slots.register(
+      {
+        name: "settings.plugin.item",
+        id: "prompt-stash",
+        order: 30,
+        locale: NS,
+      },
+      (props: SettingsProps) =>
+        createElement(PromptStashSettings, { ...props, controller }),
     ),
   );
 }

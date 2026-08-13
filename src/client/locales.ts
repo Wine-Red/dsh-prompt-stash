@@ -4,6 +4,7 @@ export const NS = "prompt-stash" as const;
 
 export const zh = {
   "action.stash": "暂存",
+  "action.stashShortcut": "暂存（{shortcut}）",
   "action.open": "查看输入暂存，共 {count} 条",
   "action.restore": "恢复此条",
   "action.delete": "删除此条",
@@ -30,12 +31,25 @@ export const zh = {
     "本地存储写入失败，输入内容未被清空。请检查浏览器存储空间后重试。",
   "error.draftWrite": "无法更新输入框。暂存副本仍然保留。",
   "error.cleanupCopy": "内容已恢复，但暂存副本未能移除；你可以稍后手动删除。",
+  "settings.title": "输入暂存",
+  "settings.description": "配置将当前输入加入暂存的快捷键",
+  "settings.expand": "展开",
+  "settings.collapse": "折叠",
+  "settings.unsaved": "未保存",
+  "settings.shortcutLabel": "加入暂存快捷键",
+  "settings.shortcutHint":
+    "点击输入框后按下一个按键或组合键。仅在消息输入框内生效。",
+  "settings.reset": "恢复默认",
+  "settings.discard": "放弃更改",
+  "settings.save": "保存",
+  "settings.saveFailed": "无法保存快捷键，请检查浏览器本地存储后重试。",
 } as const;
 
 export type PromptStashLocaleKey = keyof typeof zh;
 
 export const en: LocaleDictOf<typeof NS> = {
   "action.stash": "Stash",
+  "action.stashShortcut": "Stash ({shortcut})",
   "action.open": "View {count} stashed prompts",
   "action.restore": "Restore this prompt",
   "action.delete": "Delete this prompt",
@@ -68,6 +82,20 @@ export const en: LocaleDictOf<typeof NS> = {
     "The composer could not be updated. A stashed copy is still available.",
   "error.cleanupCopy":
     "The prompt was restored, but its stash copy could not be removed. You can delete it later.",
+  "settings.title": "Prompt stash",
+  "settings.description":
+    "Configure the shortcut that stashes the current prompt",
+  "settings.expand": "Expand",
+  "settings.collapse": "Collapse",
+  "settings.unsaved": "Unsaved",
+  "settings.shortcutLabel": "Stash shortcut",
+  "settings.shortcutHint":
+    "Focus the field, then press one key or a key combination. It only works in the message composer.",
+  "settings.reset": "Reset to default",
+  "settings.discard": "Discard changes",
+  "settings.save": "Save",
+  "settings.saveFailed":
+    "The shortcut could not be saved. Check browser storage and try again.",
 };
 
 declare module "@deepseek-ai/dsh-client-ui-slots" {

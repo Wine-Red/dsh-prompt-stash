@@ -1,4 +1,4 @@
-import { useMemo, useRef, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import { Button, Toast, Tooltip } from "@deepseek-ai/dsh-client-ui-primitives";
 import type { TranslateNS } from "@deepseek-ai/dsh-client-ui-slots";
 import { PromptStashController } from "./controller";
@@ -6,6 +6,7 @@ import type { DshInputActions, DshInputState } from "./dsh-types";
 import { canStash } from "./model";
 import { NS } from "./locales";
 import { buttonStyles as styles } from "./styles";
+import { matchesShortcut } from "./shortcut";
 
 export interface PromptStashButtonProps {
   readonly controller: PromptStashController;
@@ -80,8 +81,33 @@ export function PromptStashButton({
   const anchorRef = useRef<HTMLDivElement>(null);
   const eligibility = useMemo(() => canStash(input), [input]);
   const stashLabel = eligibility.allowed
-    ? t("action.stash")
+    ? t("action.stashShortcut", { shortcut: snapshot.shortcut })
     : t(`error.blocked.${eligibility.reason ?? "empty"}`);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (
+        event.defaultPrevented ||
+        event.repeat ||
+        event.isComposing ||
+        !(event.target instanceof HTMLTextAreaElement) ||
+        !matchesShortcut(event, snapshot.shortcut)
+      )
+        return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (eligibility.allowed) controller.stash(sessionId, input, inputActions);
+    };
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [
+    controller,
+    eligibility.allowed,
+    input,
+    inputActions,
+    sessionId,
+    snapshot.shortcut,
+  ]);
 
   return (
     <div
@@ -96,7 +122,7 @@ export function PromptStashButton({
           className={styles.stashButton}
           icon={<ArchiveIcon />}
           disabled={!eligibility.allowed}
-          aria-label={stashLabel}
+          aria-label={t("action.stash")}
           onClick={() => controller.stash(sessionId, input, inputActions)}
         >
           {t("action.stash")}

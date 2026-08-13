@@ -16,6 +16,7 @@ A local prompt-stash plugin for DeepSeek Harness Web. Push unsent plain-text inp
 - Clears and restores input through the official DSH `inputActions.setDraft()` API without manipulating the `textarea` or internal stores.
 - Runs entirely in the browser with no network requests; content stays in the current browser's `localStorage`.
 - Supports Chinese and English, light and dark themes, keyboard navigation, and a layout that integrates with DSH's native queued-message panel.
+- Records a single-key or key-combination shortcut under **Settings → Plugins → Plugin configuration**; the default is `Ctrl+S`.
 
 The current version supports plain text only. Input containing images, attachments, or file references cannot be stashed.
 
@@ -35,10 +36,10 @@ Stashed prompts are collapsed by default. Expand the panel to see the creation t
 
 ### Release tarball (recommended)
 
-Download `dsh-prompt-stash-0.1.0.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
+Download `dsh-prompt-stash-0.2.0.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.1.0.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.0.tgz
 ```
 
 The tarball contains prebuilt artifacts, so installation-time build scripts are not required. Restart DSH Web after installation.
@@ -72,16 +73,21 @@ Uninstalling the plugin does not remove existing `dsh.promptStash.v1` data from 
 ## Usage
 
 1. Write a plain-text prompt in the composer.
-2. Select **Stash** in the composer toolbar. The input is cleared and a collapsed stash bar appears immediately above it.
+2. Select **Stash** in the composer toolbar, or press the stash shortcut while the message composer is focused. The input is cleared and a collapsed stash bar appears immediately above it.
 3. Enter and send the temporary question.
 4. Expand the stash bar and select the prompt you want to restore.
 5. If the composer already contains text, choose **Stash current input and restore this item**, or cancel.
 
 Successful add and delete operations do not show toast notifications. Error notifications appear only when storage or composer updates fail.
 
+### Configure the shortcut
+
+Open **Settings → Plugins → Plugin configuration → Prompt stash**, focus the shortcut field, press one key or a key combination, and save. Changes take effect immediately. The default is `Ctrl+S`; a single key such as `F8` is also supported. The shortcut only runs in the message composer. A printable single-key shortcut consumes that character's normal typing behavior.
+
 ## Data and security boundaries
 
 - Storage key: `dsh.promptStash.v1`
+- Settings key: `dsh.promptStash.settings.v1`
 - Scope: the current browser, isolated by `sessionId`
 - Stored data: text, ID, creation and update timestamps, and schema version
 - Not stored: image data, attachment contents, file contents, credentials, or environment information
@@ -105,7 +111,7 @@ The project follows the official DSH bundle package layout:
 - `dsh.bundle.patch` in `package.json` declares the configuration layer.
 - `cordis.patch.yml` mounts the plugin by package name.
 - `lib/` contains the prebuilt runtime entry points and is included in the tarball.
-- The client registers the `conversation.input.left` and `conversation.input.dock` slots.
+- The client registers the `conversation.input.left`, `conversation.input.dock`, and `settings.plugin.item` slots.
 
 See the [official DeepSeek Harness documentation](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish) for packaging and installation details.
 

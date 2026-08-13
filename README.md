@@ -16,6 +16,7 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 - 使用 DSH 官方 `inputActions.setDraft()` 清空和恢复，不操作 `textarea` 或内部 Store。
 - 纯客户端实现，不联网；内容只保存在当前浏览器的 `localStorage`。
 - 支持中英文、深浅主题、键盘操作和 DSH 原生队列组合布局。
+- 可在“设置 → 插件 → 插件配置”中录入单键或组合键快捷键，默认使用 `Ctrl+S`。
 
 当前版本仅支持纯文本。带图片、附件或文件引用的输入不会被暂存。
 
@@ -35,10 +36,10 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 
 ### Release tarball（推荐）
 
-从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.1.0.tgz`，然后安装到 Web profile：
+从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.0.tgz`，然后安装到 Web profile：
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.1.0.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.0.tgz
 ```
 
 tarball 已包含构建产物，不需要允许安装期构建脚本。安装后重启 DSH Web。
@@ -72,16 +73,21 @@ dsh plugin --profile web remove dsh-prompt-stash
 ## 使用
 
 1. 在输入框中编写一段纯文本。
-2. 点击工具栏中的“暂存”。输入框会被清空，上方立即出现折叠的暂存消息栏。
+2. 点击工具栏中的“暂存”，或在消息输入框内按下暂存快捷键。输入框会被清空，上方立即出现折叠的暂存消息栏。
 3. 输入并发送临时问题。
 4. 展开暂存消息，点击目标内容恢复。
 5. 如果输入框已有内容，选择“暂存当前内容并恢复此条”，或取消操作。
 
 添加或删除成功时不会弹出通知；只有存储或输入更新失败时才会显示错误提示。
 
+### 配置快捷键
+
+打开“设置 → 插件 → 插件配置 → 输入暂存”，点击快捷键输入框后直接按下一个按键或组合键，再保存即可立即生效。默认快捷键为 `Ctrl+S`，也可以配置为 `F8` 等单键。快捷键只在消息输入框内生效；使用单个可打印字符会占用该字符原本的输入行为。
+
 ## 数据与安全边界
 
 - 存储键：`dsh.promptStash.v1`
+- 设置键：`dsh.promptStash.settings.v1`
 - 范围：当前浏览器、按 `sessionId` 隔离
 - 内容：文本、ID、创建与更新时间、结构版本
 - 不存储：图片二进制、附件正文、文件内容、凭据或环境信息
@@ -105,7 +111,7 @@ pnpm pack
 - `package.json` 中的 `dsh.bundle.patch` 声明配置层。
 - `cordis.patch.yml` 通过包名挂载插件。
 - `lib/` 是预构建运行入口，并被收录进 tarball。
-- 客户端分别注册 `conversation.input.left` 和 `conversation.input.dock` 插槽。
+- 客户端注册 `conversation.input.left`、`conversation.input.dock` 和 `settings.plugin.item` 插槽。
 
 打包与安装机制参见 [DeepSeek Harness 官方文档](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)。
 

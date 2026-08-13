@@ -23,11 +23,18 @@ vi.mock("@deepseek-ai/dsh-client-ui-primitives", () => ({
       height: size,
       "data-testid": "archive-icon",
     }),
-  IconChevronDownOutline14: ({ size = 14 }: { size?: number }) =>
+  IconChevronDownOutline14: ({
+    size = 14,
+    ...props
+  }: {
+    size?: number;
+    className?: string;
+  }) =>
     createElement("svg", {
       width: size,
       height: size,
       "data-testid": "chevron-down-icon",
+      ...props,
     }),
   IconChevronUpOutline14: ({ size = 14 }: { size?: number }) =>
     createElement("svg", {

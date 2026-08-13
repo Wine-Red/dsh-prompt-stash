@@ -7,6 +7,7 @@ import { en, zh, type PromptStashLocaleKey } from "../src/client/locales";
 import { createEntry } from "../src/client/model";
 import { PromptStashButton } from "../src/client/PromptStashButton";
 import { PromptStashList } from "../src/client/PromptStashList";
+import { PromptStashSettings } from "../src/client/PromptStashSettings";
 import { emptyDocument, pushEntry, writeDocument } from "../src/client/storage";
 import { installStyles, STYLE_ID } from "../src/client/styles";
 import { inputState } from "./fixtures";
@@ -79,6 +80,87 @@ describe("prompt stash UI", () => {
 
     await user.click(screen.getByRole("button", { name: "暂存" }));
     expect(screen.getByRole("status")).toHaveTextContent("本地存储写入失败");
+    controller.dispose();
+  });
+
+  it("stashes with the configured shortcut only from the composer", () => {
+    const controller = new PromptStashController(
+      window.localStorage,
+      () => 1,
+      () => "shortcut-entry",
+    );
+    const setDraft = vi.fn();
+    render(
+      <>
+        <textarea aria-label="Composer" defaultValue="important" />
+        <input aria-label="Other input" />
+        <PromptStashButton
+          controller={controller}
+          sessionId="s"
+          input={inputState({ draft: "important" })}
+          inputActions={{ setDraft }}
+          t={t}
+        />
+      </>,
+    );
+
+    const other = screen.getByRole("textbox", { name: "Other input" });
+    other.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "s", ctrlKey: true, bubbles: true }),
+    );
+    expect(setDraft).not.toHaveBeenCalled();
+
+    const composer = screen.getByRole("textbox", { name: "Composer" });
+    const shortcutEvent = new KeyboardEvent("keydown", {
+      key: "s",
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    composer.dispatchEvent(shortcutEvent);
+    expect(shortcutEvent.defaultPrevented).toBe(true);
+    expect(setDraft).toHaveBeenCalledWith("");
+    expect(controller.entries("s").map((entry) => entry.text)).toEqual([
+      "important",
+    ]);
+    controller.dispose();
+  });
+
+  it("records, saves, and immediately uses a custom single-key shortcut", async () => {
+    const user = userEvent.setup();
+    const controller = new PromptStashController(window.localStorage);
+    const { rerender } = render(
+      <PromptStashSettings controller={controller} t={t} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "展开: 输入暂存" }));
+    const field = screen.getByRole("textbox", { name: "加入暂存快捷键" });
+    expect(field).toHaveValue("Ctrl+S");
+    await user.click(field);
+    await user.keyboard("{F8}");
+    expect(field).toHaveValue("F8");
+    await user.click(screen.getByRole("button", { name: "保存" }));
+    expect(controller.getSnapshot().shortcut).toBe("F8");
+
+    const setDraft = vi.fn();
+    rerender(
+      <>
+        <textarea aria-label="Composer" />
+        <PromptStashButton
+          controller={controller}
+          sessionId="s"
+          input={inputState({ draft: "via F8" })}
+          inputActions={{ setDraft }}
+          t={t}
+        />
+      </>,
+    );
+    screen
+      .getByRole("textbox", { name: "Composer" })
+      .dispatchEvent(
+        new KeyboardEvent("keydown", { key: "F8", bubbles: true }),
+      );
+    expect(setDraft).toHaveBeenCalledWith("");
     controller.dispose();
   });
 

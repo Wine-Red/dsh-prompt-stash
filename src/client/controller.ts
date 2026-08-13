@@ -17,6 +17,7 @@ import {
   writeDocument,
   type StorageLike,
 } from "./storage";
+import { SHORTCUT_STORAGE_KEY, readShortcut, writeShortcut } from "./shortcut";
 
 export interface StashNotice {
   readonly key: string;
@@ -28,6 +29,7 @@ export interface ControllerSnapshot {
   readonly document: StashDocumentV1;
   readonly openSessionId: string | null;
   readonly notice: StashNotice | null;
+  readonly shortcut: string;
 }
 
 export class PromptStashController {
@@ -36,8 +38,12 @@ export class PromptStashController {
   private noticeSeq = 0;
   private disposed = false;
   private readonly onStorage = (event: StorageEvent): void => {
-    if (event.key === STORAGE_KEY)
+    if (event.key === STORAGE_KEY) {
       this.replaceDocument(readDocument(this.storage));
+      return;
+    }
+    if (event.key === SHORTCUT_STORAGE_KEY)
+      this.publish({ shortcut: readShortcut(this.storage) });
   };
 
   constructor(
@@ -51,6 +57,7 @@ export class PromptStashController {
       document: readDocument(storage),
       openSessionId: null,
       notice: null,
+      shortcut: readShortcut(storage),
     };
     if (typeof window !== "undefined")
       window.addEventListener("storage", this.onStorage);
@@ -214,6 +221,16 @@ export class PromptStashController {
 
   dismissNotice(): void {
     if (this.snapshot.notice !== null) this.publish({ notice: null });
+  }
+
+  saveShortcut(shortcut: string): boolean {
+    try {
+      const normalized = writeShortcut(this.storage, shortcut);
+      this.publish({ shortcut: normalized });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   dispose(): void {
