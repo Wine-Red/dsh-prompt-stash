@@ -2,6 +2,8 @@
 
 # dsh-prompt-stash
 
+[简体中文](README.md) | [English](README.en.md)
+
 DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本压入当前会话的 LIFO 暂存栈，先处理临时问题，之后再安全恢复原输入。
 
 > 输入暂存不是草稿同步。DSH 已负责保存当前输入框草稿；本插件提供的是一组可明确存入、恢复和删除的临时输入副本。
