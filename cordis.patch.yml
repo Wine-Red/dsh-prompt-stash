@@ -1,0 +1,5 @@
+# dsh-prompt-stash bundle patch. The DSH plugin manager discovers this layer
+# from package.json and adds this package to the profile bundle stack.
+- insert:
+    - id: prompt-stash
+      name: dsh-prompt-stash

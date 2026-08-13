@@ -1,0 +1,9 @@
+node_modules/
+lib/
+coverage/
+*.tgz
+test-results/
+screenshots/
+.env
+.env.*
+!.env.example
