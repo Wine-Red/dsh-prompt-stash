@@ -1,3 +1,5 @@
+![dsh-prompt-stash — Save the thought. Ask the detour.](docs/assets/dsh-prompt-stash-cover.jpg)
+
 # dsh-prompt-stash
 
 DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本压入当前会话的 LIFO 暂存栈，先处理临时问题，之后再安全恢复原输入。
@@ -14,6 +16,12 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 - 支持中英文、深浅主题、键盘操作和 DSH 原生队列组合布局。
 
 当前版本仅支持纯文本。带图片、附件或文件引用的输入不会被暂存。
+
+## 效果
+
+![暂存消息与 DSH 原生排队消息组合显示](docs/assets/dsh-prompt-stash-demo.png)
+
+暂存内容默认折叠；展开后可查看创建时间与两行文本预览，并执行恢复、删除或清空操作。
 
 ## 要求
 
