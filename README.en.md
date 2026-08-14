@@ -4,7 +4,9 @@
 
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
 [![npm version](https://img.shields.io/npm/v/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
-[![npm downloads](https://img.shields.io/npm/dm/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
+[![CI](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml/badge.svg)](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml)
+[![DSH compatibility](https://img.shields.io/badge/DSH%20compatibility-0.1.0--rc.6-blue.svg)](https://deepseek-harness.github.io/deepseek-harness/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [简体中文](README.md) | [English](README.en.md)
 
