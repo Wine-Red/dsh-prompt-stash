@@ -2,6 +2,9 @@
 
 # dsh-prompt-stash
 
+[![npm version](https://img.shields.io/npm/v/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
+[![npm downloads](https://img.shields.io/npm/dm/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
+
 [简体中文](README.md) | [English](README.en.md)
 
 A local prompt-stash plugin for DeepSeek Harness Web. Push unsent plain-text input onto a per-session LIFO stack, handle a quick detour, and safely restore the original prompt afterward.
@@ -34,15 +37,31 @@ Stashed prompts are collapsed by default. Expand the panel to see the creation t
 
 ## Installation
 
-### Release tarball (recommended)
+### npm registry (recommended)
 
-Download `dsh-prompt-stash-0.2.1.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
+Install directly into the DSH Web profile:
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.1.tgz
+dsh plugin --profile web add dsh-prompt-stash
 ```
 
-The tarball contains prebuilt artifacts, so installation-time build scripts are not required. Restart DSH Web after installation.
+The npm package contains prebuilt artifacts, so installation-time build scripts are not required. Restart DSH Web after installation.
+
+Update to the latest version:
+
+```sh
+dsh plugin --profile web update dsh-prompt-stash
+```
+
+### GitHub Release tarball (fallback)
+
+Download `dsh-prompt-stash-0.2.2.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
+
+```sh
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.2.tgz
+```
+
+The tarball also contains prebuilt artifacts. Restart DSH Web after installation.
 
 ### Local source checkout
 
@@ -80,7 +99,7 @@ Uninstalling the plugin does not remove existing `dsh.promptStash.v1` data from 
 
 Successful add and delete operations do not show toast notifications. Error notifications appear only when storage or composer updates fail.
 
-Press the shortcut again while the message composer is empty to restore and pop the latest stash. Repeating this walks backward through the LIFO stack. The shortcut never restores over whitespace, images, or file references already in the composer.
+Press the shortcut while the message composer is empty to restore and pop the latest stash. To restore the next item, send or clear the current input first; pressing the shortcut with non-empty input pushes it as a new stash. The shortcut never restores over whitespace, images, or file references already in the composer.
 
 ### Configure the shortcut
 

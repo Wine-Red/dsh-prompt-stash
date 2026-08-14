@@ -1,6 +1,6 @@
 {
   "name": "dsh-prompt-stash",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Local, per-session prompt stash for DeepSeek Harness Web",
   "homepage": "https://github.com/Wine-Red/dsh-prompt-stash#readme",
   "repository": {
@@ -9,6 +9,10 @@
   },
   "bugs": {
     "url": "https://github.com/Wine-Red/dsh-prompt-stash/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "type": "module",
   "main": "lib/index.js",

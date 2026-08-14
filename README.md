@@ -2,6 +2,9 @@
 
 # dsh-prompt-stash
 
+[![npm version](https://img.shields.io/npm/v/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
+[![npm downloads](https://img.shields.io/npm/dm/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
+
 [简体中文](README.md) | [English](README.en.md)
 
 DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本压入当前会话的 LIFO 暂存栈，先处理临时问题，之后再安全恢复原输入。
@@ -34,15 +37,31 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 
 ## 安装
 
-### Release tarball（推荐）
+### npm registry（推荐）
 
-从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.1.tgz`，然后安装到 Web profile：
+直接安装到 DSH Web profile：
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.1.tgz
+dsh plugin --profile web add dsh-prompt-stash
 ```
 
-tarball 已包含构建产物，不需要允许安装期构建脚本。安装后重启 DSH Web。
+npm 包已包含构建产物，不需要允许安装期构建脚本。安装后重启 DSH Web。
+
+更新到最新版本：
+
+```sh
+dsh plugin --profile web update dsh-prompt-stash
+```
+
+### GitHub Release tarball（备用）
+
+从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.2.tgz`，然后安装到 Web profile：
+
+```sh
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.2.tgz
+```
+
+tarball 同样包含预构建产物。安装后重启 DSH Web。
 
 ### 本地源码 checkout
 
@@ -80,7 +99,7 @@ dsh plugin --profile web remove dsh-prompt-stash
 
 添加或删除成功时不会弹出通知；只有存储或输入更新失败时才会显示错误提示。
 
-消息输入框为空时再次按下快捷键，会恢复并弹出最新一条暂存；连续使用即可按后进先出顺序逐条恢复。快捷键不会覆盖空白字符、图片或文件引用等当前输入。
+消息输入框为空时按下快捷键，会恢复并弹出最新一条暂存。要恢复下一条，请先发送或清空当前输入；非空输入按下快捷键会作为新条目暂存。快捷键不会覆盖空白字符、图片或文件引用等当前输入。
 
 ### 配置快捷键
 
