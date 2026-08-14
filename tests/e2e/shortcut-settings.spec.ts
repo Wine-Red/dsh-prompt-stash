@@ -41,6 +41,25 @@ test("configures a single-key stash shortcut in the real plugin settings", async
   await expect(composer).toHaveValue("stashed by custom shortcut");
   await expect(page.locator("[data-prompt-stash-dock]")).toHaveCount(0);
 
+  await composer.fill("first rotation item");
+  await composer.press("F8");
+  await expect(composer).toHaveValue("");
+  await composer.fill("second rotation item");
+  await composer.press("F8");
+  await expect(composer).toHaveValue("");
+  await composer.fill("third rotation item");
+  await composer.press("F8");
+  await expect(composer).toHaveValue("");
+
+  await composer.press("F8");
+  await expect(composer).toHaveValue("third rotation item");
+  await composer.press("F8");
+  await expect(composer).toHaveValue("second rotation item");
+  await composer.press("F8");
+  await expect(composer).toHaveValue("first rotation item");
+  await composer.press("F8");
+  await expect(composer).toHaveValue("third rotation item");
+
   await page.reload({ waitUntil: "networkidle" });
   expect(
     await page.evaluate(() =>

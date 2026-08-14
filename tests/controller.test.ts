@@ -97,6 +97,182 @@ describe("PromptStashController", () => {
     controller.dispose();
   });
 
+  it("rotates through every stash on repeated shortcut presses", () => {
+    let document = pushEntry(
+      emptyDocument(),
+      "session",
+      createEntry("oldest", 1, "oldest"),
+    );
+    document = pushEntry(
+      document,
+      "session",
+      createEntry("middle", 2, "middle"),
+    );
+    document = pushEntry(
+      document,
+      "session",
+      createEntry("latest", 3, "latest"),
+    );
+    writeDocument(window.localStorage, document);
+    const controller = new PromptStashController(window.localStorage, () => 4);
+    const setDraft = vi.fn();
+
+    expect(
+      controller.activateShortcut("session", inputState(), { setDraft }),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("latest");
+    expect(controller.entries("session").map((entry) => entry.text)).toEqual([
+      "middle",
+      "oldest",
+    ]);
+
+    expect(
+      controller.activateShortcut("session", inputState({ draft: "latest" }), {
+        setDraft,
+      }),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("middle");
+    expect(controller.entries("session").map((entry) => entry.text)).toEqual([
+      "oldest",
+      "latest",
+    ]);
+
+    expect(
+      controller.activateShortcut("session", inputState({ draft: "middle" }), {
+        setDraft,
+      }),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("oldest");
+    expect(controller.entries("session").map((entry) => entry.text)).toEqual([
+      "latest",
+      "middle",
+    ]);
+
+    expect(
+      controller.activateShortcut("session", inputState({ draft: "oldest" }), {
+        setDraft,
+      }),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("latest");
+    expect(controller.entries("session").map((entry) => entry.text)).toEqual([
+      "middle",
+      "oldest",
+    ]);
+    controller.dispose();
+  });
+
+  it("stashes changed restored content as a new item instead of rotating", () => {
+    let document = pushEntry(
+      emptyDocument(),
+      "session",
+      createEntry("older", 1, "older"),
+    );
+    document = pushEntry(
+      document,
+      "session",
+      createEntry("latest", 2, "latest"),
+    );
+    writeDocument(window.localStorage, document);
+    const controller = new PromptStashController(
+      window.localStorage,
+      () => 3,
+      () => "edited",
+    );
+    const setDraft = vi.fn();
+
+    expect(
+      controller.activateShortcut("session", inputState(), { setDraft }),
+    ).toBe(true);
+    expect(
+      controller.activateShortcut(
+        "session",
+        inputState({ draft: "latest, edited" }),
+        { setDraft },
+      ),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("");
+    expect(controller.entries("session")).toMatchObject([
+      {
+        id: "edited",
+        text: "latest, edited",
+        createdAt: 3,
+        updatedAt: 3,
+      },
+      { id: "older", text: "older" },
+    ]);
+
+    expect(
+      controller.activateShortcut("session", inputState(), { setDraft }),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("latest, edited");
+    controller.dispose();
+  });
+
+  it("keeps the original stash-and-clear behavior with one rotation item", () => {
+    const document = pushEntry(
+      emptyDocument(),
+      "session",
+      createEntry("only item", 1, "only"),
+    );
+    writeDocument(window.localStorage, document);
+    const controller = new PromptStashController(window.localStorage);
+    const setDraft = vi.fn();
+
+    expect(
+      controller.activateShortcut("session", inputState(), { setDraft }),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("only item");
+    expect(controller.entries("session")).toEqual([]);
+
+    expect(
+      controller.activateShortcut(
+        "session",
+        inputState({ draft: "only item" }),
+        { setDraft },
+      ),
+    ).toBe(true);
+    expect(setDraft).toHaveBeenLastCalledWith("");
+    expect(controller.entries("session").map((entry) => entry.text)).toEqual([
+      "only item",
+    ]);
+    controller.dispose();
+  });
+
+  it("keeps both rotation items when updating the composer fails", () => {
+    let document = pushEntry(
+      emptyDocument(),
+      "session",
+      createEntry("older", 1, "older"),
+    );
+    document = pushEntry(
+      document,
+      "session",
+      createEntry("latest", 2, "latest"),
+    );
+    writeDocument(window.localStorage, document);
+    const controller = new PromptStashController(window.localStorage, () => 3);
+    const setDraft = vi.fn();
+
+    expect(
+      controller.activateShortcut("session", inputState(), { setDraft }),
+    ).toBe(true);
+    setDraft.mockImplementationOnce(() => {
+      throw new Error("composer unavailable");
+    });
+
+    expect(
+      controller.activateShortcut("session", inputState({ draft: "latest" }), {
+        setDraft,
+      }),
+    ).toBe(false);
+    expect(controller.entries("session").map((entry) => entry.text)).toEqual([
+      "latest",
+      "older",
+    ]);
+    expect(controller.getSnapshot().notice?.key).toBe("error.draftWrite");
+    controller.dispose();
+  });
+
   it("does not restore with current content, attachments, or a busy composer", () => {
     const document = pushEntry(
       emptyDocument(),

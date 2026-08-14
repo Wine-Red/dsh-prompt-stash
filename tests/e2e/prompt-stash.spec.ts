@@ -3,6 +3,12 @@ import { expect, test, type Page } from "@playwright/test";
 const LONG_PROMPT =
   "请帮我分析这个仓库的模块边界、运行时数据流和测试覆盖，并保持现有接口兼容。\n同时列出最可能出现回归的三个位置。";
 const TEMP_PROMPT = "临时问题：当前会话使用的模型是什么？";
+const ONE_STASH = /^(1 stashed prompt|1 条暂存消息)$/;
+const TWO_STASHES = /^(2 stashed prompts|2 条暂存消息)$/;
+const ANY_STASHES = /(stashed prompts?|条暂存消息)/;
+const PROMPT_STASH = /^(Prompt stash|输入暂存)$/;
+const SEND_MESSAGE = /^(Send message|发送消息)$/;
+const CANCEL = /^(Cancel|取消)$/;
 
 async function composer(page: Page) {
   return page.locator("textarea").first();
@@ -36,21 +42,16 @@ test("stashes, persists, guards overwrite, swaps, deletes, and clears in the rea
   await expect(page.getByText("Prompt stashed.", { exact: true })).toHaveCount(
     0,
   );
-  await expect(
-    page.getByRole("button", { name: "1 stashed prompt" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "1 stashed prompt" }),
-  ).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByRole("button", { name: ONE_STASH })).toBeVisible();
+  await expect(page.getByRole("button", { name: ONE_STASH })).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
 
   await input.fill(TEMP_PROMPT);
-  await expect(
-    page.getByRole("button", { name: "Send message" }),
-  ).toBeEnabled();
-  await page.getByRole("button", { name: "1 stashed prompt" }).click();
-  await expect(
-    page.getByRole("region", { name: "Prompt stash" }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: SEND_MESSAGE })).toBeEnabled();
+  await page.getByRole("button", { name: ONE_STASH }).click();
+  await expect(page.getByRole("region", { name: PROMPT_STASH })).toBeVisible();
   await expect(page.getByText(LONG_PROMPT, { exact: true })).toBeVisible();
   const itemBox = await page.locator(".dsh-prompt-stash-item").boundingBox();
   const composerBox = await input.boundingBox();
@@ -65,19 +66,18 @@ test("stashes, persists, guards overwrite, swaps, deletes, and clears in the rea
   await page.locator(".dsh-prompt-stash-restore").first().click();
   await expect(
     page.getByRole("dialog", {
-      name: "Your current prompt will not be overwritten",
+      name: /^(Your current prompt will not be overwritten|当前输入不会被覆盖)$/,
     }),
   ).toBeVisible();
   await expect(input).toHaveValue(TEMP_PROMPT);
-  await page
-    .getByRole("button", { name: "Cancel", exact: true })
-    .last()
-    .click();
+  await page.getByRole("button", { name: CANCEL }).last().click();
   await expect(input).toHaveValue(TEMP_PROMPT);
 
   await page.locator(".dsh-prompt-stash-restore").first().click();
   await page
-    .getByRole("button", { name: "Stash current prompt and restore this one" })
+    .getByRole("button", {
+      name: /^(Stash current prompt and restore this one|暂存当前内容并恢复此条)$/,
+    })
     .click();
   await expect(input).toHaveValue(LONG_PROMPT);
   await expect(page.getByText(TEMP_PROMPT, { exact: true })).toBeVisible();
@@ -85,50 +85,41 @@ test("stashes, persists, guards overwrite, swaps, deletes, and clears in the rea
   await page.reload({ waitUntil: "networkidle" });
   const reloadedInput = await composer(page);
   await expect(reloadedInput).toHaveValue(LONG_PROMPT);
-  await expect(
-    page.getByRole("button", { name: "1 stashed prompt" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "1 stashed prompt" }).click();
+  await expect(page.getByRole("button", { name: ONE_STASH })).toBeVisible();
+  await page.getByRole("button", { name: ONE_STASH }).click();
   await expect(page.getByText(TEMP_PROMPT, { exact: true })).toBeVisible();
 
   await page
     .getByRole("button", {
-      name: new RegExp(`^Delete this prompt: ${TEMP_PROMPT}`),
+      name: new RegExp(`^(Delete this prompt|删除此条): ${TEMP_PROMPT}`),
     })
     .click();
   await expect(
     page.getByText("Stashed prompt deleted.", { exact: true }),
   ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: /stashed prompts/ }),
-  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: ANY_STASHES })).toHaveCount(0);
 
   await reloadedInput.fill("one");
   await page.locator(".dsh-prompt-stash-button").click();
   await reloadedInput.fill("two");
   await page.locator(".dsh-prompt-stash-button").click();
-  await page.getByRole("button", { name: "2 stashed prompts" }).click();
+  await page.getByRole("button", { name: TWO_STASHES }).click();
   await expect(page.getByText("two", { exact: true })).toBeVisible();
   await expect(page.getByText("one", { exact: true })).toBeVisible();
   const previews = page.locator(".dsh-prompt-stash-preview");
   expect(await previews.allTextContents()).toEqual(["two", "one"]);
 
-  await page.getByRole("button", { name: "Clear" }).click();
+  await page.getByRole("button", { name: /^(Clear|清空)$/ }).click();
   await expect(
-    page.getByRole("dialog", { name: "Clear every stash in this session?" }),
+    page.getByRole("dialog", {
+      name: /^(Clear every stash in this session\?|清空当前会话的全部暂存？)$/,
+    }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Cancel", exact: true })
-    .last()
-    .click();
-  await expect(
-    page.getByRole("button", { name: "2 stashed prompts" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Clear" }).click();
-  await page.getByRole("button", { name: "Clear all" }).click();
-  await expect(
-    page.getByRole("button", { name: /stashed prompts/ }),
-  ).toHaveCount(0);
+  await page.getByRole("button", { name: CANCEL }).last().click();
+  await expect(page.getByRole("button", { name: TWO_STASHES })).toBeVisible();
+  await page.getByRole("button", { name: /^(Clear|清空)$/ }).click();
+  await page.getByRole("button", { name: /^(Clear all|清空全部)$/ }).click();
+  await expect(page.getByRole("button", { name: ANY_STASHES })).toHaveCount(0);
   expect(pluginErrors).toEqual([]);
 });
 
@@ -159,9 +150,9 @@ test("composes cleanly with the native queue dock", async ({ page }) => {
   await expect(page.locator("[data-queue-dock]")).toBeVisible();
   const stashDock = page.locator("[data-prompt-stash-dock]");
   await expect(
-    stashDock.getByRole("button", { name: "1 stashed prompt" }),
+    stashDock.getByRole("button", { name: ONE_STASH }),
   ).toHaveAttribute("aria-expanded", "false");
-  await stashDock.getByRole("button", { name: "1 stashed prompt" }).click();
+  await stashDock.getByRole("button", { name: ONE_STASH }).click();
 
   const queue = page.locator("[data-queue-dock]");
   const queueHeader = queue.locator("button[aria-expanded]").first();
@@ -170,7 +161,7 @@ test("composes cleanly with the native queue dock", async ({ page }) => {
     stashDock.locator(".dsh-prompt-stash-header-lead svg"),
   ).toBeVisible();
   await expect(
-    stashDock.getByRole("button", { name: "1 stashed prompt" }),
+    stashDock.getByRole("button", { name: ONE_STASH }),
   ).toHaveAttribute("aria-expanded", "true");
   await expect(stashDock.locator("time")).toHaveCount(1);
   const queueLeadBox = await queueHeader.locator("svg").first().boundingBox();
@@ -250,7 +241,7 @@ test("keeps session stacks isolated and remains readable in dark mode", async ({
   const input = await composer(page);
   await input.fill("session-one-stash");
   await page.locator(".dsh-prompt-stash-button").click();
-  await page.getByRole("button", { name: "1 stashed prompt" }).click();
+  await page.getByRole("button", { name: ONE_STASH }).click();
   await page.screenshot({
     path: "screenshots/dsh-prompt-stash-dark.png",
     fullPage: true,
@@ -267,13 +258,11 @@ test("keeps session stacks isolated and remains readable in dark mode", async ({
   expect(sessionOneId).toBeTruthy();
 
   await page
-    .getByRole("tree", { name: "Sessions" })
+    .getByRole("tree", { name: /^(Sessions|会话)$/ })
     .locator('[role="treeitem"][aria-selected="false"]')
     .first()
     .click();
-  await expect(
-    page.getByRole("button", { name: /stashed prompts/ }),
-  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: ANY_STASHES })).toHaveCount(0);
   await expect(await composer(page)).toHaveValue("");
 
   const storage = await page.evaluate(() =>

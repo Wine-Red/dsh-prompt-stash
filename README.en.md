@@ -100,11 +100,11 @@ Uninstalling the plugin does not remove existing `dsh.promptStash.v1` data from 
 
 Successful add and delete operations do not show toast notifications. Error notifications appear only when storage or composer updates fail.
 
-Press the shortcut while the message composer is empty to restore and pop the latest stash. To restore the next item, send or clear the current input first; pressing the shortcut with non-empty input pushes it as a new stash. The shortcut never restores over whitespace, images, or file references already in the composer.
+Press the shortcut while the message composer is empty to restore and pop the latest stash. If the restored text remains unchanged, keep pressing the same shortcut to rotate through the remaining prompts from newest to oldest; the current prompt moves safely to the back and appears again after a full cycle. Editing or replacing the restored text exits rotation, so the next shortcut press adds the current content as a new stash and clears the composer. This keeps repeated multi-item stashing available. With only one item in the rotation, pressing again also uses the normal stash-and-clear behavior. The shortcut never restores over whitespace, images, or file references already in the composer.
 
 ### Configure the shortcut
 
-Open **Settings → Plugins → Plugin configuration → Prompt stash**, focus the shortcut field, press one key or a key combination, and save. Changes take effect immediately. The default is `Ctrl+S`; a single key such as `F8` is also supported. The shortcut stashes non-empty input and restores the latest stash when the composer is empty. It only runs in the message composer. A printable single-key shortcut consumes that character's normal typing behavior.
+Open **Settings → Plugins → Plugin configuration → Prompt stash**, focus the shortcut field, press one key or a key combination, and save. Changes take effect immediately. The default is `Ctrl+S`; a single key such as `F8` is also supported. The shortcut stashes non-empty input and restores the latest stash when the composer is empty; once restored, repeated presses rotate through the remaining stashes. It only runs in the message composer. A printable single-key shortcut consumes that character's normal typing behavior.
 
 ## Data and security boundaries
 

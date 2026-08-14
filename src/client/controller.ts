@@ -9,6 +9,7 @@ import {
 } from "./model";
 import {
   entriesFor,
+  prepareRotation,
   prepareSwap,
   pushEntry,
   readDocument,
@@ -35,6 +36,7 @@ export interface ControllerSnapshot {
 export class PromptStashController {
   private snapshot: ControllerSnapshot;
   private readonly listeners = new Set<() => void>();
+  private readonly shortcutRotations = new Map<string, StashEntry>();
   private noticeSeq = 0;
   private disposed = false;
   private readonly onStorage = (event: StorageEvent): void => {
@@ -108,6 +110,7 @@ export class PromptStashController {
       this.setNotice("error.storageWrite");
       return false;
     }
+    this.shortcutRotations.delete(sessionId);
     try {
       actions.setDraft("");
     } catch {
@@ -124,6 +127,12 @@ export class PromptStashController {
     actions: Pick<DshInputActions, "setDraft">,
   ): boolean {
     const eligibility = canStash(input);
+    if (
+      eligibility.allowed &&
+      this.shortcutRotations.get(sessionId)?.text === input.draft &&
+      this.entries(sessionId).length > 0
+    )
+      return this.rotateShortcut(sessionId, input, actions);
     if (eligibility.allowed) return this.stash(sessionId, input, actions);
 
     const composerIsEmpty =
@@ -153,6 +162,7 @@ export class PromptStashController {
       (entry) => entry.id === targetId,
     );
     if (target === undefined) return false;
+    this.shortcutRotations.delete(sessionId);
     try {
       actions.setDraft(target.text);
     } catch {
@@ -161,6 +171,7 @@ export class PromptStashController {
     }
     try {
       this.commit(removeEntry(this.snapshot.document, sessionId, targetId));
+      this.shortcutRotations.set(sessionId, target);
       this.dismissNotice();
       return true;
     } catch {
@@ -199,6 +210,7 @@ export class PromptStashController {
       this.setNotice("error.storageWrite");
       return false;
     }
+    this.shortcutRotations.delete(sessionId);
     try {
       actions.setDraft(target.text);
     } catch {
@@ -207,6 +219,7 @@ export class PromptStashController {
     }
     try {
       this.commit(removeEntry(this.snapshot.document, sessionId, targetId));
+      this.shortcutRotations.set(sessionId, target);
       this.dismissNotice();
       return true;
     } catch {
@@ -230,6 +243,7 @@ export class PromptStashController {
   clear(sessionId: string): boolean {
     try {
       this.commit(withEntries(this.snapshot.document, sessionId, []));
+      this.shortcutRotations.delete(sessionId);
       this.dismissNotice();
       return true;
     } catch {
@@ -258,6 +272,49 @@ export class PromptStashController {
     if (typeof window !== "undefined")
       window.removeEventListener("storage", this.onStorage);
     this.listeners.clear();
+    this.shortcutRotations.clear();
+  }
+
+  private rotateShortcut(
+    sessionId: string,
+    input: DshInputState,
+    actions: Pick<DshInputActions, "setDraft">,
+  ): boolean {
+    const current = this.shortcutRotations.get(sessionId);
+    const target = this.entries(sessionId)[0];
+    if (current === undefined || target === undefined) return false;
+
+    let staged: StashDocumentV1;
+    try {
+      staged = prepareRotation(
+        this.snapshot.document,
+        sessionId,
+        current,
+        target.id,
+        this.limit,
+      );
+      this.commit(staged);
+    } catch {
+      this.setNotice("error.storageWrite");
+      return false;
+    }
+    try {
+      actions.setDraft(target.text);
+    } catch {
+      this.shortcutRotations.delete(sessionId);
+      this.setNotice("error.draftWrite");
+      return false;
+    }
+    try {
+      this.commit(removeEntry(this.snapshot.document, sessionId, target.id));
+      this.shortcutRotations.set(sessionId, target);
+      this.dismissNotice();
+      return true;
+    } catch {
+      this.shortcutRotations.delete(sessionId);
+      this.setNotice("error.cleanupCopy");
+      return false;
+    }
   }
 
   private replaceDocument(document: StashDocumentV1): void {

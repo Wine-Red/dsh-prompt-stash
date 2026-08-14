@@ -134,3 +134,24 @@ export function prepareSwap(
   const keptOthers = others.slice(0, Math.max(0, limit - 2));
   return withEntries(document, sessionId, [current, ...keptOthers, target]);
 }
+
+/**
+ * Stage a shortcut rotation without losing either the current composer text or
+ * the next target. After the composer is updated, callers remove `targetId`,
+ * leaving the current item at the back of the rotation queue.
+ */
+export function prepareRotation(
+  document: StashDocumentV1,
+  sessionId: string,
+  current: StashEntry,
+  targetId: string,
+  limit = DEFAULT_STACK_LIMIT,
+): StashDocumentV1 {
+  if (limit < 2) throw new Error("stash-rotation-limit-too-small");
+  const old = entriesFor(document, sessionId);
+  const target = old.find((entry) => entry.id === targetId);
+  if (target === undefined) throw new Error("stash-target-missing");
+  const others = old.filter((entry) => entry.id !== targetId);
+  const keptOthers = others.slice(0, Math.max(0, limit - 2));
+  return withEntries(document, sessionId, [...keptOthers, current, target]);
+}
