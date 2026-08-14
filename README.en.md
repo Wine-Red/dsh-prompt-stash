@@ -2,6 +2,7 @@
 
 # dsh-prompt-stash
 
+[![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
 [![npm version](https://img.shields.io/npm/v/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
 [![npm downloads](https://img.shields.io/npm/dm/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
 
