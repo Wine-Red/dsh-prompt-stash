@@ -43,7 +43,7 @@ export const zh = {
   "settings.reset": "恢复默认",
   "settings.discard": "放弃更改",
   "settings.save": "保存",
-  "settings.saveFailed": "无法保存快捷键，请检查浏览器本地存储后重试。",
+  "settings.saveFailed": "快捷键未能保存到 DSH Host 设置，请重试。",
 } as const;
 
 export type PromptStashLocaleKey = keyof typeof zh;
@@ -97,7 +97,7 @@ export const en: LocaleDictOf<typeof NS> = {
   "settings.discard": "Discard changes",
   "settings.save": "Save",
   "settings.saveFailed":
-    "The shortcut could not be saved. Check browser storage and try again.",
+    "The shortcut could not be saved to DSH Host settings. Try again.",
 };
 
 declare module "@deepseek-ai/dsh-client-ui-slots" {

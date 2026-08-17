@@ -1,5 +1,4 @@
 export const DEFAULT_STASH_SHORTCUT = "Ctrl+S";
-export const SHORTCUT_STORAGE_KEY = "dsh.promptStash.settings.v1";
 
 export interface ShortcutSpec {
   readonly ctrl: boolean;
@@ -85,6 +84,11 @@ export function parseShortcut(value: string): ShortcutSpec | null {
   return { ctrl, alt, shift, meta, key };
 }
 
+export function normalizeShortcut(value: string): string | null {
+  const spec = parseShortcut(value);
+  return spec === null ? null : formatShortcut(spec);
+}
+
 export function shortcutFromKeyboardEvent(
   event: Pick<
     KeyboardEvent,
@@ -116,37 +120,4 @@ export function matchesShortcut(
   const expected = parseShortcut(shortcut);
   const actual = shortcutFromKeyboardEvent(event);
   return expected !== null && actual === formatShortcut(expected);
-}
-
-export function readShortcut(storage: Pick<Storage, "getItem">): string {
-  try {
-    const raw = storage.getItem(SHORTCUT_STORAGE_KEY);
-    if (raw === null) return DEFAULT_STASH_SHORTCUT;
-    const parsed = JSON.parse(raw) as unknown;
-    if (
-      typeof parsed !== "object" ||
-      parsed === null ||
-      (parsed as { version?: unknown }).version !== 1 ||
-      typeof (parsed as { shortcut?: unknown }).shortcut !== "string"
-    )
-      return DEFAULT_STASH_SHORTCUT;
-    const spec = parseShortcut((parsed as { shortcut: string }).shortcut);
-    return spec === null ? DEFAULT_STASH_SHORTCUT : formatShortcut(spec);
-  } catch {
-    return DEFAULT_STASH_SHORTCUT;
-  }
-}
-
-export function writeShortcut(
-  storage: Pick<Storage, "setItem">,
-  shortcut: string,
-): string {
-  const spec = parseShortcut(shortcut);
-  if (spec === null) throw new TypeError("Invalid shortcut");
-  const normalized = formatShortcut(spec);
-  storage.setItem(
-    SHORTCUT_STORAGE_KEY,
-    JSON.stringify({ version: 1, shortcut: normalized }),
-  );
-  return normalized;
 }

@@ -20,7 +20,7 @@ A local prompt-stash plugin for DeepSeek Harness Web. Push unsent plain-text inp
 - Shows a collapsed stash bar above the composer immediately after stashing; expand it to preview, restore, delete, or clear entries.
 - Never silently overwrites non-empty input; restoring requires confirmation to stash the current input first.
 - Clears and restores input through the official DSH `inputActions.setDraft()` API without manipulating the `textarea` or internal stores.
-- Runs entirely in the browser with no network requests; content stays in the current browser's `localStorage`.
+- Stashed content stays in the current browser's `localStorage`; the shortcut is stored through DSH Host settings and survives reloads and browser changes.
 - Supports Chinese and English, light and dark themes, keyboard navigation, and a layout that integrates with DSH's native queued-message panel.
 - Records a single-key or key-combination shortcut under **Settings → Plugins → Plugin configuration**; the default is `Ctrl+S`.
 
@@ -58,10 +58,10 @@ dsh plugin --profile web update dsh-prompt-stash
 
 ### GitHub Release tarball (fallback)
 
-Download `dsh-prompt-stash-0.2.3.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
+Download `dsh-prompt-stash-0.2.4.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.3.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.4.tgz
 ```
 
 The tarball also contains prebuilt artifacts. Restart DSH Web after installation.
@@ -111,11 +111,11 @@ Open **Settings → Plugins → Plugin configuration → Prompt stash**, focus t
 ## Data and security boundaries
 
 - Storage key: `dsh.promptStash.v1`
-- Settings key: `dsh.promptStash.settings.v1`
-- Scope: the current browser, isolated by `sessionId`
+- Settings namespace: `dsh-prompt-stash` in DSH Host `settings.yaml`
+- Stash scope: the current browser, isolated by `sessionId`
 - Stored data: text, ID, creation and update timestamps, and schema version
 - Not stored: image data, attachment contents, file contents, credentials, or environment information
-- No network requests and no telemetry
+- Stashed content makes no network requests and adds no telemetry; only the shortcut uses DSH's built-in settings transport to the Host
 
 Clearing the site's browser data also removes all stashed prompts.
 
@@ -135,7 +135,7 @@ The project follows the official DSH bundle package layout:
 - `dsh.bundle.patch` in `package.json` declares the configuration layer.
 - `cordis.patch.yml` mounts the plugin by package name.
 - `lib/` contains the prebuilt runtime entry points and is included in the tarball.
-- The client registers the `conversation.input.left`, `conversation.input.dock`, and `settings.general.item` slots.
+- The Host registers the `dsh-prompt-stash` settings namespace; the client registers `conversation.input.left`, `conversation.input.dock`, and a keyed `settings.plugin.item` entry for that namespace.
 
 See the [official DeepSeek Harness documentation](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish) for packaging and installation details.
 

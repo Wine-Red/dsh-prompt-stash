@@ -20,7 +20,7 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 - 暂存后立即在输入框上方显示折叠栏，可展开预览、恢复、删除或清空。
 - 当前输入非空时不会直接覆盖；恢复前必须确认先暂存当前内容。
 - 使用 DSH 官方 `inputActions.setDraft()` 清空和恢复，不操作 `textarea` 或内部 Store。
-- 纯客户端实现，不联网；内容只保存在当前浏览器的 `localStorage`。
+- 暂存内容只保存在当前浏览器的 `localStorage`；快捷键配置通过 DSH Host settings 保存，可跨刷新和浏览器生效。
 - 支持中英文、深浅主题、键盘操作和 DSH 原生队列组合布局。
 - 可在“设置 → 插件 → 插件配置”中录入单键或组合键快捷键，默认使用 `Ctrl+S`。
 
@@ -58,10 +58,10 @@ dsh plugin --profile web update dsh-prompt-stash
 
 ### GitHub Release tarball（备用）
 
-从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.3.tgz`，然后安装到 Web profile：
+从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.4.tgz`，然后安装到 Web profile：
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.3.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.4.tgz
 ```
 
 tarball 同样包含预构建产物。安装后重启 DSH Web。
@@ -111,11 +111,11 @@ dsh plugin --profile web remove dsh-prompt-stash
 ## 数据与安全边界
 
 - 存储键：`dsh.promptStash.v1`
-- 设置键：`dsh.promptStash.settings.v1`
-- 范围：当前浏览器、按 `sessionId` 隔离
+- 设置命名空间：`dsh-prompt-stash`（DSH Host `settings.yaml`）
+- 暂存范围：当前浏览器、按 `sessionId` 隔离
 - 内容：文本、ID、创建与更新时间、结构版本
 - 不存储：图片二进制、附件正文、文件内容、凭据或环境信息
-- 不发送网络请求，不收集遥测
+- 暂存内容不发送网络请求、不收集遥测；快捷键只通过 DSH 内置 settings 通道读写 Host 配置
 
 浏览器站点数据被清理时，暂存内容也会被删除。
 
@@ -135,7 +135,7 @@ pnpm pack
 - `package.json` 中的 `dsh.bundle.patch` 声明配置层。
 - `cordis.patch.yml` 通过包名挂载插件。
 - `lib/` 是预构建运行入口，并被收录进 tarball。
-- 客户端注册 `conversation.input.left`、`conversation.input.dock` 和 `settings.general.item` 插槽。
+- Host 注册 `dsh-prompt-stash` settings 命名空间；客户端注册 `conversation.input.left`、`conversation.input.dock` 和以该命名空间为键的 `settings.plugin.item` 插槽。
 
 打包与安装机制参见 [DeepSeek Harness 官方文档](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)。
 
