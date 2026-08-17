@@ -5,34 +5,41 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { IconChevronDownOutline14 } from "@deepseek-ai/dsh-client-ui-primitives";
+import type { SettingsScope } from "@deepseek-ai/dsh-client-runtime/client";
 import type { TranslateNS } from "@deepseek-ai/dsh-client-ui-slots";
-import { PromptStashController } from "./controller";
 import { NS } from "./locales";
 import { DEFAULT_STASH_SHORTCUT, shortcutFromKeyboardEvent } from "./shortcut";
+import {
+  PROMPT_STASH_SHORTCUT_FIELD,
+  type PromptStashSettings,
+} from "../settings";
 import { settingsStyles as styles } from "./styles";
 
 export interface PromptStashSettingsProps {
-  readonly controller: PromptStashController;
+  readonly settingsScope: SettingsScope<PromptStashSettings>;
   readonly t: TranslateNS<typeof NS>;
 }
 
 export function PromptStashSettings({
-  controller,
+  settingsScope,
   t,
 }: PromptStashSettingsProps): React.JSX.Element {
-  const snapshot = useSyncExternalStore(
-    controller.subscribe,
-    controller.getSnapshot,
-    controller.getSnapshot,
+  const settingsSnapshot = useSyncExternalStore(
+    (listener) => settingsScope.subscribe(listener),
+    () => settingsScope.getSnapshot(),
+    () => settingsScope.getSnapshot(),
   );
+  const shortcut = settingsSnapshot.value?.shortcut ?? DEFAULT_STASH_SHORTCUT;
   const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState(snapshot.shortcut);
+  const [draft, setDraft] = useState(shortcut);
   const [failed, setFailed] = useState(false);
-  const dirty = draft !== snapshot.shortcut;
+  const dirty = draft !== shortcut;
+  const writable =
+    settingsSnapshot.status === "ready" && settingsSnapshot.writable;
 
   useEffect(() => {
-    setDraft(snapshot.shortcut);
-  }, [snapshot.shortcut]);
+    setDraft(shortcut);
+  }, [shortcut]);
 
   const recordShortcut = (
     event: ReactKeyboardEvent<HTMLInputElement>,
@@ -48,7 +55,14 @@ export function PromptStashSettings({
   };
 
   const save = (): void => {
-    setFailed(!controller.saveShortcut(draft));
+    setFailed(false);
+    void settingsScope
+      .set(PROMPT_STASH_SHORTCUT_FIELD, draft)
+      .then(() => {
+        if (settingsScope.getSnapshot().value?.shortcut !== draft)
+          setFailed(true);
+      })
+      .catch(() => setFailed(true));
   };
 
   return (
@@ -84,7 +98,7 @@ export function PromptStashSettings({
               <button
                 type="button"
                 className={styles.reset}
-                disabled={draft === DEFAULT_STASH_SHORTCUT}
+                disabled={!writable || draft === DEFAULT_STASH_SHORTCUT}
                 onClick={() => {
                   setDraft(DEFAULT_STASH_SHORTCUT);
                   setFailed(false);
@@ -119,7 +133,7 @@ export function PromptStashSettings({
               className={styles.discard}
               disabled={!dirty}
               onClick={() => {
-                setDraft(snapshot.shortcut);
+                setDraft(shortcut);
                 setFailed(false);
               }}
             >
@@ -128,7 +142,7 @@ export function PromptStashSettings({
             <button
               type="button"
               className={styles.save}
-              disabled={!dirty}
+              disabled={!dirty || !writable}
               onClick={save}
             >
               {t("settings.save")}

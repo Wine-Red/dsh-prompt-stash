@@ -11,6 +11,7 @@ import { PromptStashSettings } from "../src/client/PromptStashSettings";
 import { emptyDocument, pushEntry, writeDocument } from "../src/client/storage";
 import { installStyles, STYLE_ID } from "../src/client/styles";
 import { inputState } from "./fixtures";
+import { MemoryPromptStashSettings } from "./settings-fixture";
 
 const t: TranslateNS<"prompt-stash"> = (
   key,
@@ -167,8 +168,13 @@ describe("prompt stash UI", () => {
   it("records, saves, and immediately uses a custom single-key shortcut", async () => {
     const user = userEvent.setup();
     const controller = new PromptStashController(window.localStorage);
+    const settingsScope = new MemoryPromptStashSettings();
+    const unsubscribe = settingsScope.subscribe(() => {
+      const shortcut = settingsScope.getSnapshot().value?.shortcut;
+      if (shortcut !== undefined) controller.setShortcut(shortcut);
+    });
     const { rerender } = render(
-      <PromptStashSettings controller={controller} t={t} />,
+      <PromptStashSettings settingsScope={settingsScope} t={t} />,
     );
 
     await user.click(screen.getByRole("button", { name: "展开: 输入暂存" }));
@@ -199,7 +205,28 @@ describe("prompt stash UI", () => {
         new KeyboardEvent("keydown", { key: "F8", bubbles: true }),
       );
     expect(setDraft).toHaveBeenCalledWith("");
+    expect(
+      window.localStorage.getItem("dsh.promptStash.settings.v1"),
+    ).toBeNull();
+    unsubscribe();
     controller.dispose();
+  });
+
+  it("reports a Host write that settles without accepting the shortcut", async () => {
+    const user = userEvent.setup();
+    const settingsScope = new MemoryPromptStashSettings();
+    vi.spyOn(settingsScope, "set").mockResolvedValue();
+    render(<PromptStashSettings settingsScope={settingsScope} t={t} />);
+
+    await user.click(screen.getByRole("button", { name: "展开: 输入暂存" }));
+    const field = screen.getByRole("textbox", { name: "加入暂存快捷键" });
+    await user.click(field);
+    await user.keyboard("{F8}");
+    await user.click(screen.getByRole("button", { name: "保存" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "快捷键未能保存到 DSH Host 设置",
+    );
   });
 
   it("requires confirmation before replacing a non-empty composer and before clear all", async () => {

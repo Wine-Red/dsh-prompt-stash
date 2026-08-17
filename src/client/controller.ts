@@ -18,7 +18,7 @@ import {
   writeDocument,
   type StorageLike,
 } from "./storage";
-import { SHORTCUT_STORAGE_KEY, readShortcut, writeShortcut } from "./shortcut";
+import { DEFAULT_STASH_SHORTCUT, normalizeShortcut } from "./shortcut";
 
 export interface StashNotice {
   readonly key: string;
@@ -44,8 +44,6 @@ export class PromptStashController {
       this.replaceDocument(readDocument(this.storage));
       return;
     }
-    if (event.key === SHORTCUT_STORAGE_KEY)
-      this.publish({ shortcut: readShortcut(this.storage) });
   };
 
   constructor(
@@ -53,13 +51,14 @@ export class PromptStashController {
     private readonly now: () => number = Date.now,
     private readonly makeId: () => string = () => crypto.randomUUID(),
     private readonly limit = DEFAULT_STACK_LIMIT,
+    shortcut = DEFAULT_STASH_SHORTCUT,
   ) {
     this.snapshot = {
       revision: 0,
       document: readDocument(storage),
       openSessionId: null,
       notice: null,
-      shortcut: readShortcut(storage),
+      shortcut: normalizeShortcut(shortcut) ?? DEFAULT_STASH_SHORTCUT,
     };
     if (typeof window !== "undefined")
       window.addEventListener("storage", this.onStorage);
@@ -256,14 +255,10 @@ export class PromptStashController {
     if (this.snapshot.notice !== null) this.publish({ notice: null });
   }
 
-  saveShortcut(shortcut: string): boolean {
-    try {
-      const normalized = writeShortcut(this.storage, shortcut);
+  setShortcut(shortcut: string): void {
+    const normalized = normalizeShortcut(shortcut);
+    if (normalized !== null && normalized !== this.snapshot.shortcut)
       this.publish({ shortcut: normalized });
-      return true;
-    } catch {
-      return false;
-    }
   }
 
   dispose(): void {

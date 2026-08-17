@@ -1,12 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   DEFAULT_STASH_SHORTCUT,
-  SHORTCUT_STORAGE_KEY,
   matchesShortcut,
+  normalizeShortcut,
   parseShortcut,
-  readShortcut,
   shortcutFromKeyboardEvent,
-  writeShortcut,
 } from "../src/client/shortcut";
 
 describe("prompt stash shortcut", () => {
@@ -45,25 +43,10 @@ describe("prompt stash shortcut", () => {
     expect(matchesShortcut({ ...event, ctrlKey: false }, "S")).toBe(true);
   });
 
-  it("persists a versioned shortcut and falls back on invalid data", () => {
-    const storage = window.localStorage;
-    expect(readShortcut(storage)).toBe(DEFAULT_STASH_SHORTCUT);
-    expect(writeShortcut(storage, "alt+f8")).toBe("Alt+F8");
-    expect(readShortcut(storage)).toBe("Alt+F8");
-    expect(JSON.parse(storage.getItem(SHORTCUT_STORAGE_KEY) ?? "null")).toEqual(
-      {
-        version: 1,
-        shortcut: "Alt+F8",
-      },
-    );
-
-    storage.setItem(SHORTCUT_STORAGE_KEY, "not json");
-    expect(readShortcut(storage)).toBe(DEFAULT_STASH_SHORTCUT);
-    const failing = {
-      setItem: vi.fn(() => {
-        throw new Error("quota");
-      }),
-    };
-    expect(() => writeShortcut(failing, "F8")).toThrow("quota");
+  it("normalizes valid settings values without using browser storage", () => {
+    expect(DEFAULT_STASH_SHORTCUT).toBe("Ctrl+S");
+    expect(normalizeShortcut("alt+f8")).toBe("Alt+F8");
+    expect(normalizeShortcut("Ctrl+Ctrl+S")).toBeNull();
+    expect(window.localStorage.length).toBe(0);
   });
 });
