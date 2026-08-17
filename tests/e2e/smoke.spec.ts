@@ -14,5 +14,11 @@ test("DSH loads the prompt stash client without runtime errors", async ({
   await expect(
     page.locator('[data-testid="prompt-stash-controls"]'),
   ).toHaveCount(1);
-  expect(errors.filter((error) => error.includes("prompt-stash"))).toEqual([]);
+  expect(
+    errors.filter((error) =>
+      /prompt-stash|failed to load plugins|failed to apply loader entry/i.test(
+        error,
+      ),
+    ),
+  ).toEqual([]);
 });

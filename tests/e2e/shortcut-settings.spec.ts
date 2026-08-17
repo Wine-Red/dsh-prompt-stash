@@ -12,7 +12,7 @@ test("configures a single-key stash shortcut in the real plugin settings", async
 
   await page.goto("/", { waitUntil: "networkidle" });
   await page.getByRole("button", { name: /设置|Settings/ }).click();
-  await page.getByRole("button", { name: /^(插件|Plugins)$/ }).click();
+  await page.getByRole("button", { name: /^(通用设置|General)$/ }).click();
 
   const card = page.getByRole("button", { name: /输入暂存|Prompt stash/ });
   await expect(card).toBeVisible();

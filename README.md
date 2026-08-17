@@ -5,7 +5,7 @@
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
 [![npm version](https://img.shields.io/npm/v/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
 [![CI](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml/badge.svg)](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml)
-[![DSH compatibility](https://img.shields.io/badge/DSH%20compatibility-0.1.0--rc.6-blue.svg)](https://deepseek-harness.github.io/deepseek-harness/)
+[![DSH compatibility](https://img.shields.io/badge/DSH%20compatibility-rc.6%20%7C%20rc.7-blue.svg)](https://deepseek-harness.github.io/deepseek-harness/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [简体中文](README.md) | [English](README.en.md)
@@ -34,7 +34,7 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 
 ## 要求
 
-- DeepSeek Harness `0.1.0-rc.6`
+- DeepSeek Harness `0.1.0-rc.6` 或 `0.1.0-rc.7`
 - Web profile
 - Node.js 20 或更高版本（仅源码开发需要）
 
@@ -58,10 +58,10 @@ dsh plugin --profile web update dsh-prompt-stash
 
 ### GitHub Release tarball（备用）
 
-从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.2.tgz`，然后安装到 Web profile：
+从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.3.tgz`，然后安装到 Web profile：
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.2.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.3.tgz
 ```
 
 tarball 同样包含预构建产物。安装后重启 DSH Web。
@@ -135,7 +135,7 @@ pnpm pack
 - `package.json` 中的 `dsh.bundle.patch` 声明配置层。
 - `cordis.patch.yml` 通过包名挂载插件。
 - `lib/` 是预构建运行入口，并被收录进 tarball。
-- 客户端注册 `conversation.input.left`、`conversation.input.dock` 和 `settings.plugin.item` 插槽。
+- 客户端注册 `conversation.input.left`、`conversation.input.dock` 和 `settings.general.item` 插槽。
 
 打包与安装机制参见 [DeepSeek Harness 官方文档](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)。
 

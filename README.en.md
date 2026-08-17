@@ -5,7 +5,7 @@
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
 [![npm version](https://img.shields.io/npm/v/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
 [![CI](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml/badge.svg)](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml)
-[![DSH compatibility](https://img.shields.io/badge/DSH%20compatibility-0.1.0--rc.6-blue.svg)](https://deepseek-harness.github.io/deepseek-harness/)
+[![DSH compatibility](https://img.shields.io/badge/DSH%20compatibility-rc.6%20%7C%20rc.7-blue.svg)](https://deepseek-harness.github.io/deepseek-harness/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [简体中文](README.md) | [English](README.en.md)
@@ -34,7 +34,7 @@ Stashed prompts are collapsed by default. Expand the panel to see the creation t
 
 ## Requirements
 
-- DeepSeek Harness `0.1.0-rc.6`
+- DeepSeek Harness `0.1.0-rc.6` or `0.1.0-rc.7`
 - A Web profile
 - Node.js 20 or later (source development only)
 
@@ -58,10 +58,10 @@ dsh plugin --profile web update dsh-prompt-stash
 
 ### GitHub Release tarball (fallback)
 
-Download `dsh-prompt-stash-0.2.2.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
+Download `dsh-prompt-stash-0.2.3.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.2.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.3.tgz
 ```
 
 The tarball also contains prebuilt artifacts. Restart DSH Web after installation.
@@ -135,7 +135,7 @@ The project follows the official DSH bundle package layout:
 - `dsh.bundle.patch` in `package.json` declares the configuration layer.
 - `cordis.patch.yml` mounts the plugin by package name.
 - `lib/` contains the prebuilt runtime entry points and is included in the tarball.
-- The client registers the `conversation.input.left`, `conversation.input.dock`, and `settings.plugin.item` slots.
+- The client registers the `conversation.input.left`, `conversation.input.dock`, and `settings.general.item` slots.
 
 See the [official DeepSeek Harness documentation](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish) for packaging and installation details.
 

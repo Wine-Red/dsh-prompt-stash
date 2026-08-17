@@ -55,7 +55,7 @@ describe("client plugin lifecycle", () => {
     expect(first.registrations).toEqual([
       "conversation.input.left:prompt-stash",
       "conversation.input.dock:prompt-stash",
-      "settings.plugin.item:prompt-stash",
+      "settings.general.item:prompt-stash",
     ]);
     expect(document.querySelectorAll(`#${STYLE_ID}`)).toHaveLength(1);
     first.dispose();
