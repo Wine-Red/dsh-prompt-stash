@@ -38,9 +38,10 @@ const configs = [
     dts: false,
     sourcemap: true,
     clean: false,
-    external: CLIENT_EXTERNALS,
-    noExternal: (id: string) =>
-      CLIENT_EXTERNALS.includes(id) ? undefined : true,
+    deps: {
+      neverBundle: CLIENT_EXTERNALS,
+      alwaysBundle: (id: string) => !CLIENT_EXTERNALS.includes(id),
+    },
     define: {
       "process.env.NODE_ENV": JSON.stringify(
         process.env.NODE_ENV ?? "production",

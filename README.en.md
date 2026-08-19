@@ -34,9 +34,11 @@ Stashed prompts are collapsed by default. Expand the panel to see the creation t
 
 ## Requirements
 
-- DeepSeek Harness `0.1.0-rc.6` or `0.1.0-rc.7`
+- DeepSeek Harness `0.1.0-rc.6`, `0.1.0-rc.7`, or `0.1.0-rc.8`
 - A Web profile
 - Node.js 20 or later (source development only)
+
+Host, settings, style, and slot registration are fail-open boundaries. A conflicting mount disables and logs only that feature instead of propagating the exception into DSH startup.
 
 ## Installation
 
@@ -58,10 +60,10 @@ dsh plugin --profile web update dsh-prompt-stash
 
 ### GitHub Release tarball (fallback)
 
-Download `dsh-prompt-stash-0.2.4.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
+Download `dsh-prompt-stash-0.2.5.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.4.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.5.tgz
 ```
 
 The tarball also contains prebuilt artifacts. Restart DSH Web after installation.
