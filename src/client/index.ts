@@ -39,8 +39,74 @@ type InputDockProps = PropsRuntime<"conversation.input.dock"> &
 type SettingsProps = PropsRuntime<"settings.plugin.item"> &
   PropsLocale<typeof NS>;
 
-export function apply(ctx: ClientContext): void {
-  const controller = new PromptStashController(window.localStorage);
+type Cleanup = () => void;
+
+function formatStartupError(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function logStartupFailure(
+  ctx: ClientContext,
+  scope: string,
+  error: unknown,
+): void {
+  try {
+    ctx.logger.error(
+      `dsh-prompt-stash: ${scope} disabled after startup failure: ${formatStartupError(error)}`,
+    );
+  } catch {
+    // Logging must never turn a plugin failure back into a DSH startup failure.
+  }
+}
+
+function safeEffect(
+  ctx: ClientContext,
+  scope: string,
+  install: () => Cleanup,
+): void {
+  try {
+    ctx.effect(() => {
+      try {
+        return install();
+      } catch (error) {
+        logStartupFailure(ctx, scope, error);
+        return () => undefined;
+      }
+    }, scope);
+  } catch (error) {
+    logStartupFailure(ctx, scope, error);
+  }
+}
+
+function safeContribution(
+  ctx: ClientContext,
+  scope: string,
+  register: () => () => void,
+): () => void {
+  try {
+    return register();
+  } catch (error) {
+    logStartupFailure(ctx, scope, error);
+    return () => undefined;
+  }
+}
+
+function safeSlotInject(
+  ctx: ClientContext,
+  scope: string,
+  inject: () => void,
+): void {
+  try {
+    inject();
+  } catch (error) {
+    logStartupFailure(ctx, scope, error);
+  }
+}
+
+function initialize(
+  ctx: ClientContext,
+  controller: PromptStashController,
+): void {
   const settingsScope = ctx.settingsScope.bind({
     namespace: PROMPT_STASH_SETTINGS_NAMESPACE,
     decode: decodePromptStashSettings,
@@ -61,54 +127,65 @@ export function apply(ctx: ClientContext): void {
         migrationPending = false;
       });
   };
-  ctx.effect(() => {
+  safeEffect(ctx, "prompt-stash: Host shortcut settings", () => {
     const unsubscribe = settingsScope.subscribe(() => {
-      syncShortcut();
-      migrateShortcut();
+      try {
+        syncShortcut();
+        migrateShortcut();
+      } catch (error) {
+        logStartupFailure(ctx, "Host shortcut synchronization", error);
+      }
     });
     syncShortcut();
     migrateShortcut();
     return unsubscribe;
-  }, "prompt-stash: Host shortcut settings");
-  ctx.effect(
-    () => () => controller.dispose(),
+  });
+  safeEffect(
+    ctx,
     "prompt-stash: local storage lifecycle",
+    () => () => controller.dispose(),
   );
-  ctx.effect(() => installStyles(document), "prompt-stash: styles");
-  ctx.effect(
-    () => ctx.locale.register(NS, { zh, en }),
-    "prompt-stash: dictionaries",
+  safeEffect(ctx, "prompt-stash: styles", () => installStyles(document));
+  safeEffect(ctx, "prompt-stash: dictionaries", () =>
+    ctx.locale.register(NS, { zh, en }),
   );
 
-  ctx.slots.inject("conversation.input.left", () =>
-    ctx.slots.register(
-      {
-        name: "conversation.input.left",
-        id: "prompt-stash",
-        order: 20,
-        locale: NS,
-      },
-      (props: InputLeftProps) =>
-        createElement(PromptStashButton, { ...props, controller }),
+  safeSlotInject(ctx, "conversation.input.left", () =>
+    ctx.slots.inject("conversation.input.left", () =>
+      safeContribution(ctx, "conversation.input.left", () =>
+        ctx.slots.register(
+          {
+            name: "conversation.input.left",
+            id: "prompt-stash",
+            order: 20,
+            locale: NS,
+          },
+          (props: InputLeftProps) =>
+            createElement(PromptStashButton, { ...props, controller }),
+        ),
+      ),
     ),
   );
 
-  ctx.slots.inject("conversation.input.dock", () =>
-    ctx.slots.register(
-      {
-        name: "conversation.input.dock",
-        id: "prompt-stash",
-        order: 30,
-        locale: NS,
-      },
-      (props: InputDockProps) =>
-        createElement(PromptStashList, { ...props, controller }),
+  safeSlotInject(ctx, "conversation.input.dock", () =>
+    ctx.slots.inject("conversation.input.dock", () =>
+      safeContribution(ctx, "conversation.input.dock", () =>
+        ctx.slots.register(
+          {
+            name: "conversation.input.dock",
+            id: "prompt-stash",
+            order: 30,
+            locale: NS,
+          },
+          (props: InputDockProps) =>
+            createElement(PromptStashList, { ...props, controller }),
+        ),
+      ),
     ),
   );
 
-  // rc6 dispatched this contribution by `id`; rc7 dispatches the keyed slot by
-  // settings namespace. Keeping both fields is harmless at runtime and lets one
-  // published package degrade across the two release candidates.
+  // rc6 dispatched this contribution by `id`; rc7+ dispatch the keyed slot by
+  // settings namespace. Both fields preserve one additive build across releases.
   const settingsSlotOptions = {
     name: "settings.plugin.item",
     key: PROMPT_STASH_SETTINGS_NAMESPACE,
@@ -116,9 +193,24 @@ export function apply(ctx: ClientContext): void {
     order: 30,
     locale: NS,
   } as const;
-  ctx.slots.inject("settings.plugin.item", () =>
-    ctx.slots.register(settingsSlotOptions, (props: SettingsProps) =>
-      createElement(PromptStashSettings, { ...props, settingsScope }),
+  safeSlotInject(ctx, "settings.plugin.item", () =>
+    ctx.slots.inject("settings.plugin.item", () =>
+      safeContribution(ctx, "settings.plugin.item", () =>
+        ctx.slots.register(settingsSlotOptions, (props: SettingsProps) =>
+          createElement(PromptStashSettings, { ...props, settingsScope }),
+        ),
+      ),
     ),
   );
+}
+
+export function apply(ctx: ClientContext): void {
+  let controller: PromptStashController | undefined;
+  try {
+    controller = new PromptStashController(window.localStorage);
+    initialize(ctx, controller);
+  } catch (error) {
+    controller?.dispose();
+    logStartupFailure(ctx, "plugin initialization", error);
+  }
 }

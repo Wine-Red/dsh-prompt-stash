@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "supportedDshVersions": ["0.1.0-rc.6", "0.1.0-rc.7", "0.1.0-rc.8"],
+  "adapter": {
+    "mode": "additive-public-slots",
+    "slots": [
+      "conversation.input.left",
+      "conversation.input.dock",
+      "settings.plugin.item"
+    ],
+    "settingsDispatch": ["id", "key"],
+    "safeDegradation": "slot injection remains dormant when an owner slot is absent"
+  }
+}

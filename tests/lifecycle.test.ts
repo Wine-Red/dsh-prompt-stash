@@ -16,6 +16,9 @@ function createHarness(): Harness {
   const settingsScope = new MemoryPromptStashSettings();
 
   const ctx = {
+    logger: {
+      error: vi.fn(),
+    },
     effect(setup: () => void | (() => void)) {
       const dispose = setup();
       if (typeof dispose === "function") disposers.push(dispose);
@@ -84,5 +87,50 @@ describe("client plugin lifecycle", () => {
     ).toHaveLength(2);
     add.mockRestore();
     remove.mockRestore();
+  });
+
+  it("does not escape a settings initialization failure into DSH startup", () => {
+    const error = vi.fn();
+    const ctx = {
+      logger: { error },
+      settingsScope: {
+        bind() {
+          throw new Error("simulated settings failure");
+        },
+      },
+    } as unknown as ClientContext;
+
+    expect(() => apply(ctx)).not.toThrow();
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "plugin initialization disabled after startup failure",
+      ),
+    );
+  });
+
+  it("isolates a slot registration conflict and continues other slots", () => {
+    const harness = createHarness();
+    const error = vi.fn();
+    let registrations = 0;
+    const ctx = harness.ctx as unknown as {
+      logger: { error: typeof error };
+      slots: { register: (...args: unknown[]) => () => void };
+    };
+    ctx.logger.error = error;
+    const originalRegister = ctx.slots.register;
+    ctx.slots.register = (...args: unknown[]) => {
+      registrations += 1;
+      if (registrations === 1) throw new Error("simulated slot conflict");
+      return originalRegister(...args);
+    };
+
+    expect(() => apply(harness.ctx)).not.toThrow();
+    expect(registrations).toBe(3);
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "conversation.input.left disabled after startup failure",
+      ),
+    );
+    harness.dispose();
   });
 });

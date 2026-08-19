@@ -5,7 +5,7 @@
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
 [![npm version](https://img.shields.io/npm/v/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
 [![CI](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml/badge.svg)](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml)
-[![DSH compatibility](https://img.shields.io/badge/DSH%20compatibility-rc.6%20%7C%20rc.7-blue.svg)](https://deepseek-harness.github.io/deepseek-harness/)
+[![DSH compatibility](https://img.shields.io/badge/DSH%20compatibility-rc.6%20%7C%20rc.7%20%7C%20rc.8-blue.svg)](https://deepseek-harness.github.io/deepseek-harness/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [简体中文](README.md) | [English](README.en.md)
@@ -34,9 +34,11 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 
 ## 要求
 
-- DeepSeek Harness `0.1.0-rc.6` 或 `0.1.0-rc.7`
+- DeepSeek Harness `0.1.0-rc.6`、`0.1.0-rc.7` 或 `0.1.0-rc.8`
 - Web profile
 - Node.js 20 或更高版本（仅源码开发需要）
+
+插件的 Host、设置、样式和 slot 注册均采用故障隔离；单个挂载点冲突时会禁用对应功能并记录错误，不会把异常抛回 DSH 启动链。
 
 ## 安装
 
@@ -58,10 +60,10 @@ dsh plugin --profile web update dsh-prompt-stash
 
 ### GitHub Release tarball（备用）
 
-从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.4.tgz`，然后安装到 Web profile：
+从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.5.tgz`，然后安装到 Web profile：
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.4.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.2.5.tgz
 ```
 
 tarball 同样包含预构建产物。安装后重启 DSH Web。
