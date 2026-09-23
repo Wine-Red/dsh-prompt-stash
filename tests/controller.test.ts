@@ -25,7 +25,10 @@ describe("PromptStashController", () => {
     ["adjudicating", inputState({ draft: "text", phase: "adjudicating" })],
     ["claimed", inputState({ draft: "text", phase: "claimed" })],
     ["submitting", inputState({ draft: "text", phase: "submitting" })],
-    ["images", inputState({ draft: "text", imageIds: ["image" as never] })],
+    [
+      "images",
+      inputState({ draft: "text", attachmentIds: ["image" as never] }),
+    ],
     ["occurrences", inputState({ draft: "text", occurrences: [{} as never] })],
   ])("refuses unsafe stash state: %s", (_, input) => {
     const controller = new PromptStashController(window.localStorage);
@@ -285,7 +288,7 @@ describe("PromptStashController", () => {
 
     for (const input of [
       inputState({ draft: " " }),
-      inputState({ imageIds: ["image" as never] }),
+      inputState({ attachmentIds: ["image" as never] }),
       inputState({ occurrences: [{} as never] }),
       inputState({ phase: "submitting" }),
     ]) {

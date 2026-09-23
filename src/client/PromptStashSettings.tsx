@@ -4,8 +4,8 @@ import {
   useSyncExternalStore,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
-import { IconChevronDownOutline14 } from "@deepseek-ai/dsh-client-ui-primitives";
-import type { SettingsScope } from "@deepseek-ai/dsh-client-runtime/client";
+import { IconChevronDownOutlineMedium } from "@deepseek-ai/dsh-client-ui-primitives";
+import type { ConfigForm } from "@deepseek-ai/dsh-client-ui-settings/client";
 import type { TranslateNS } from "@deepseek-ai/dsh-client-ui-slots";
 import { NS } from "./locales";
 import { DEFAULT_STASH_SHORTCUT, shortcutFromKeyboardEvent } from "./shortcut";
@@ -16,7 +16,7 @@ import {
 import { settingsStyles as styles } from "./styles";
 
 export interface PromptStashSettingsProps {
-  readonly settingsScope: SettingsScope<PromptStashSettings>;
+  readonly settingsScope: ConfigForm<PromptStashSettings>;
   readonly t: TranslateNS<typeof NS>;
 }
 
@@ -83,7 +83,7 @@ export function PromptStashSettings({
         {dirty && (
           <span className={styles.pending}>{t("settings.unsaved")}</span>
         )}
-        <IconChevronDownOutline14
+        <IconChevronDownOutlineMedium
           className={`${styles.chevron}${open ? ` ${styles.chevronOpen}` : ""}`}
         />
       </button>

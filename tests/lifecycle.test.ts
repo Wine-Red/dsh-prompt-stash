@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { ClientContext } from "@deepseek-ai/dsh-client-runtime/client";
+import type { Context as ClientContext } from "@deepseek-ai/cordis";
 import { apply } from "../src/client/index";
 import { STYLE_ID } from "../src/client/styles";
 import { MemoryPromptStashSettings } from "./settings-fixture";
@@ -28,8 +28,8 @@ function createHarness(): Harness {
         return () => undefined;
       },
     },
-    settingsScope: {
-      bind() {
+    configForms: {
+      get() {
         return settingsScope;
       },
     },
@@ -67,7 +67,7 @@ describe("client plugin lifecycle", () => {
     expect(first.registrations).toEqual([
       "conversation.input.left:prompt-stash",
       "conversation.input.dock:prompt-stash",
-      "settings.plugin.item:dsh-prompt-stash",
+      "settings.plugins.tab:prompt-stash",
     ]);
     expect(document.querySelectorAll(`#${STYLE_ID}`)).toHaveLength(1);
     first.dispose();

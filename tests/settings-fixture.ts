@@ -1,14 +1,14 @@
 import type {
-  SettingsScope,
-  SettingsScopeSnapshot,
-} from "@deepseek-ai/dsh-client-runtime/client";
+  ConfigForm,
+  ConfigFormSnapshot,
+} from "@deepseek-ai/dsh-client-ui-settings/client";
 import type { PromptStashSettings } from "../src/settings";
 
 export class MemoryPromptStashSettings
-  implements SettingsScope<PromptStashSettings>
+  implements ConfigForm<PromptStashSettings>
 {
   private readonly listeners = new Set<() => void>();
-  private snapshot: SettingsScopeSnapshot<PromptStashSettings>;
+  private snapshot: ConfigFormSnapshot<PromptStashSettings>;
 
   constructor(
     shortcut = "Ctrl+S",
@@ -25,7 +25,7 @@ export class MemoryPromptStashSettings
     };
   }
 
-  getSnapshot(): SettingsScopeSnapshot<PromptStashSettings> {
+  getSnapshot(): ConfigFormSnapshot<PromptStashSettings> {
     return this.snapshot;
   }
 
@@ -34,7 +34,7 @@ export class MemoryPromptStashSettings
     return () => this.listeners.delete(listener);
   }
 
-  async set(field: string, value: unknown): Promise<void> {
+  async set(field: string, value: unknown): Promise<boolean> {
     if (!this.snapshot.writable) throw new Error("settings are read-only");
     if (field !== "shortcut" || typeof value !== "string")
       throw new Error("invalid settings write");
@@ -45,11 +45,27 @@ export class MemoryPromptStashSettings
       revision: (this.snapshot.revision ?? 0) + 1,
     };
     for (const listener of this.listeners) listener();
+    return true;
   }
 
-  async unset(field: string): Promise<void> {
+  async mutate(
+    ops: readonly {
+      op: "set" | "unset";
+      path: readonly string[];
+      value?: unknown;
+    }[],
+  ): Promise<boolean> {
+    for (const op of ops) {
+      if (op.op === "set") await this.set(op.path[0]!, op.value);
+      else await this.unset(op.path[0]!);
+    }
+    return true;
+  }
+
+  async unset(field: string): Promise<boolean> {
     if (field !== "shortcut") throw new Error("invalid settings clear");
     await this.set("shortcut", "Ctrl+S");
     this.snapshot = { ...this.snapshot, user: {} };
+    return true;
   }
 }

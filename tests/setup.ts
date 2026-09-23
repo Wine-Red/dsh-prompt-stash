@@ -17,13 +17,13 @@ vi.mock("@deepseek-ai/dsh-client-ui-primitives", () => ({
     children?: ReactNode;
   }) => createElement("button", props, icon, children),
   Tooltip: ({ children }: { children: ReactElement }) => children,
-  IconArchiveOutline20: ({ size = 20 }: { size?: number }) =>
+  IconArchiveOutlineMedium: ({ size = 20 }: { size?: number }) =>
     createElement("svg", {
       width: size,
       height: size,
       "data-testid": "archive-icon",
     }),
-  IconChevronDownOutline14: ({
+  IconChevronDownOutlineMedium: ({
     size = 14,
     ...props
   }: {
@@ -36,13 +36,13 @@ vi.mock("@deepseek-ai/dsh-client-ui-primitives", () => ({
       "data-testid": "chevron-down-icon",
       ...props,
     }),
-  IconChevronUpOutline14: ({ size = 14 }: { size?: number }) =>
+  IconChevronUpOutlineMedium: ({ size = 14 }: { size?: number }) =>
     createElement("svg", {
       width: size,
       height: size,
       "data-testid": "chevron-up-icon",
     }),
-  IconTrashOutline16: ({ size = 16 }: { size?: number }) =>
+  IconTrashOutlineRegular: ({ size = 16 }: { size?: number }) =>
     createElement("svg", {
       width: size,
       height: size,

@@ -25,22 +25,26 @@ export interface StashEligibility {
 }
 
 export function canStash(
-  input: Pick<DshInputState, "draft" | "phase" | "imageIds" | "occurrences">,
+  input: Pick<
+    DshInputState,
+    "draft" | "phase" | "attachmentIds" | "occurrences"
+  >,
 ): StashEligibility {
   if (input.draft.trim() === "") return { allowed: false, reason: "empty" };
   if (input.phase !== "plain") return { allowed: false, reason: "busy" };
-  if (input.imageIds.length > 0) return { allowed: false, reason: "images" };
+  if (input.attachmentIds.length > 0)
+    return { allowed: false, reason: "images" };
   if (input.occurrences.length > 0)
     return { allowed: false, reason: "occurrences" };
   return { allowed: true };
 }
 
 export function composerHasContent(
-  input: Pick<DshInputState, "draft" | "imageIds" | "occurrences">,
+  input: Pick<DshInputState, "draft" | "attachmentIds" | "occurrences">,
 ): boolean {
   return (
     input.draft.length > 0 ||
-    input.imageIds.length > 0 ||
+    input.attachmentIds.length > 0 ||
     input.occurrences.length > 0
   );
 }

@@ -1,6 +1,6 @@
 {
   "name": "dsh-prompt-stash",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Local, per-session prompt stash for DeepSeek Harness Web",
   "homepage": "https://github.com/Wine-Red/dsh-prompt-stash#readme",
   "repository": {
@@ -35,13 +35,13 @@
     "client": {
       "inject": [
         "@deepseek-ai/dsh-api-remotes",
-        "@deepseek-ai/dsh-client-connection",
-        "@deepseek-ai/dsh-client-runtime",
         "@deepseek-ai/dsh-client-locale",
         "@deepseek-ai/dsh-client-ui-slots",
         "@deepseek-ai/dsh-client-ui-conversation",
         "@deepseek-ai/dsh-client-ui-settings",
-        "@deepseek-ai/dsh-client-ui-settings-plugins"
+        "@deepseek-ai/dsh-client-ui-settings-plugins",
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-session"
       ],
       "platform": "web"
     }
@@ -78,34 +78,32 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-api-remotes": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/dsh-client-connection": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/dsh-client-locale": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/dsh-client-runtime": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/dsh-client-ui-conversation": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/dsh-client-ui-primitives": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/dsh-client-ui-slots": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/dsh-client-ui-settings": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/dsh-client-ui-settings-plugins": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/dsh-settings": ">=0.1.0-rc.6 <0.1.0-rc.9",
-    "@deepseek-ai/schemastery": "^3.18.1",
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-api-remotes": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-locale": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-conversation": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-primitives": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-slots": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-settings": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-settings-plugins": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-settings": "0.1.7-rc.1",
+    "@deepseek-ai/schemastery": "~3.18.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-session": "0.1.7-rc.1"
   },
   "devDependencies": {
-    "@deepseek-ai/cordis": "4.0.1",
-    "@deepseek-ai/dsh-api-remotes": "0.1.0-rc.8",
-    "@deepseek-ai/dsh-client-connection": "0.1.0-rc.8",
-    "@deepseek-ai/dsh-client-locale": "0.1.0-rc.8",
-    "@deepseek-ai/dsh-client-runtime": "0.1.0-rc.8",
-    "@deepseek-ai/dsh-client-ui-conversation": "0.1.0-rc.8",
-    "@deepseek-ai/dsh-client-ui-primitives": "0.1.0-rc.8",
-    "@deepseek-ai/dsh-client-ui-slots": "0.1.0-rc.8",
-    "@deepseek-ai/dsh-client-ui-settings": "0.1.0-rc.8",
-    "@deepseek-ai/dsh-client-ui-settings-plugins": "0.1.0-rc.8",
-    "@deepseek-ai/dsh-settings": "0.1.0-rc.8",
-    "@deepseek-ai/schemastery": "3.18.1",
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-api-remotes": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-locale": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-conversation": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-primitives": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-slots": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-settings": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-settings-plugins": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-settings": "0.1.7-rc.1",
+    "@deepseek-ai/schemastery": "3.18.4",
     "@playwright/test": "1.62.1",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.8.0",
@@ -120,7 +118,9 @@
     "react-dom": "18.3.1",
     "tsdown": "0.22.2",
     "typescript": "5.9.2",
-    "vitest": "3.2.4"
+    "vitest": "3.2.4",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.1.7-rc.1",
+    "@deepseek-ai/dsh-client-ui-session": "0.1.7-rc.1"
   },
   "engines": {
     "node": ">=20"

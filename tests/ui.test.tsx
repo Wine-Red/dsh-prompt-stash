@@ -93,7 +93,15 @@ describe("prompt stash UI", () => {
     const setDraft = vi.fn();
     render(
       <>
-        <textarea aria-label="Composer" defaultValue="important" />
+        <div
+          role="textbox"
+          aria-label="Composer"
+          data-composer-input
+          contentEditable
+          suppressContentEditableWarning
+        >
+          important
+        </div>
         <input aria-label="Other input" />
         <PromptStashButton
           controller={controller}
@@ -139,7 +147,12 @@ describe("prompt stash UI", () => {
     const setDraft = vi.fn();
     render(
       <>
-        <textarea aria-label="Composer" />
+        <div
+          role="textbox"
+          aria-label="Composer"
+          data-composer-input
+          contentEditable
+        />
         <PromptStashButton
           controller={controller}
           sessionId="s"
@@ -189,7 +202,12 @@ describe("prompt stash UI", () => {
     const setDraft = vi.fn();
     rerender(
       <>
-        <textarea aria-label="Composer" />
+        <div
+          role="textbox"
+          aria-label="Composer"
+          data-composer-input
+          contentEditable
+        />
         <PromptStashButton
           controller={controller}
           sessionId="s"
@@ -215,7 +233,7 @@ describe("prompt stash UI", () => {
   it("reports a Host write that settles without accepting the shortcut", async () => {
     const user = userEvent.setup();
     const settingsScope = new MemoryPromptStashSettings();
-    vi.spyOn(settingsScope, "set").mockResolvedValue();
+    vi.spyOn(settingsScope, "set").mockResolvedValue(false);
     render(<PromptStashSettings settingsScope={settingsScope} t={t} />);
 
     await user.click(screen.getByRole("button", { name: "展开: 输入暂存" }));

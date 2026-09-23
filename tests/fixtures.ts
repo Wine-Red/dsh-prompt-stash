@@ -3,7 +3,7 @@ import type { DshInputState } from "../src/client/dsh-types";
 export function inputState(patch: Partial<DshInputState> = {}): DshInputState {
   return {
     draft: "",
-    imageIds: [],
+    attachmentIds: [],
     draftRev: 0,
     phase: "plain",
     occurrences: [],

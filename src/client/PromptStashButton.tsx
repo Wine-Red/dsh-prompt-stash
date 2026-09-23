@@ -83,7 +83,7 @@ export function PromptStashButton({
   const canRestoreLatest =
     input.phase === "plain" &&
     input.draft.length === 0 &&
-    input.imageIds.length === 0 &&
+    input.attachmentIds.length === 0 &&
     input.occurrences.length === 0 &&
     controller.entries(sessionId).length > 0;
   const stashLabel = eligibility.allowed
@@ -98,7 +98,10 @@ export function PromptStashButton({
         event.defaultPrevented ||
         event.repeat ||
         event.isComposing ||
-        !(event.target instanceof HTMLTextAreaElement) ||
+        !(event.target instanceof Element) ||
+        event.target.closest(
+          '[data-composer-input][contenteditable="true"]',
+        ) === null ||
         !matchesShortcut(event, snapshot.shortcut)
       )
         return;

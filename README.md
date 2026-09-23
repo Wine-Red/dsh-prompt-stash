@@ -1,11 +1,13 @@
 ![dsh-prompt-stash — Save the thought. Ask the detour.](docs/assets/dsh-prompt-stash-cover.jpg)
 
+> 当前源码适配版：0.3.0 / DSH 0.1.7-rc.1。已迁移到官方 Config/configForms 和输入框订阅接口；快捷键写入 profile 配置，暂存内容保留原 localStorage 键。图片、文件附件和引用均禁止按纯文本暂存。旧 DSH 请继续使用 0.2.x。
+
 # dsh-prompt-stash
 
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
 [![npm version](https://img.shields.io/npm/v/dsh-prompt-stash.svg)](https://www.npmjs.com/package/dsh-prompt-stash)
 [![CI](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml/badge.svg)](https://github.com/Wine-Red/dsh-prompt-stash/actions/workflows/ci.yml)
-[![DSH compatibility](https://img.shields.io/badge/DSH%20compatibility-rc.6%20%7C%20rc.7%20%7C%20rc.8-blue.svg)](https://deepseek-harness.github.io/deepseek-harness/)
+[![DSH compatibility](https://img.shields.io/badge/DSH%20compatibility-0.1.7--rc.1-blue.svg)](https://deepseek-harness.github.io/deepseek-harness/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [简体中文](README.md) | [English](README.en.md)
@@ -22,7 +24,7 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 - 使用 DSH 官方 `inputActions.setDraft()` 清空和恢复，不操作 `textarea` 或内部 Store。
 - 暂存内容只保存在当前浏览器的 `localStorage`；快捷键配置通过 DSH Host settings 保存，可跨刷新和浏览器生效。
 - 支持中英文、深浅主题、键盘操作和 DSH 原生队列组合布局。
-- 可在“设置 → 插件 → 插件配置”中录入单键或组合键快捷键，默认使用 `Ctrl+S`。
+- 可在“设置 → 内置插件 → Prompt Stash”中录入单键或组合键快捷键，默认使用 `Ctrl+S`。
 
 当前版本仅支持纯文本。带图片、附件或文件引用的输入不会被暂存。
 
@@ -34,13 +36,15 @@ DeepSeek Harness Web 的本地输入暂存插件。把尚未发送的纯文本�
 
 ## 要求
 
-- DeepSeek Harness `0.1.0-rc.6`、`0.1.0-rc.7` 或 `0.1.0-rc.8`
+- DeepSeek Harness `0.1.7-rc.1`
 - Web profile
 - Node.js 20 或更高版本（仅源码开发需要）
 
 插件的 Host、设置、样式和 slot 注册均采用故障隔离；单个挂载点冲突时会禁用对应功能并记录错误，不会把异常抛回 DSH 启动链。
 
 ## 安装
+
+> 当前适配代码已更新到 GitHub；npm / GitHub Release 的版本可能不同。使用本次适配请按下方源码安装步骤构建，或确认下载包版本与本文一致。
 
 ### npm registry（推荐）
 
@@ -60,10 +64,10 @@ dsh plugin --profile web update dsh-prompt-stash
 
 ### GitHub Release tarball（备用）
 
-从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.2.5.tgz`，然后安装到 Web profile：
+从 [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest) 下载 `dsh-prompt-stash-0.3.0.tgz`，然后安装到 Web profile：
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.5.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.3.0.tgz
 ```
 
 tarball 同样包含预构建产物。安装后重启 DSH Web。
@@ -108,12 +112,12 @@ dsh plugin --profile web remove dsh-prompt-stash
 
 ### 配置快捷键
 
-打开“设置 → 插件 → 插件配置 → 输入暂存”，点击快捷键输入框后直接按下一个按键或组合键，再保存即可立即生效。默认快捷键为 `Ctrl+S`，也可以配置为 `F8` 等单键。输入非空时快捷键执行暂存，输入为空时恢复最新一条；进入恢复状态后，重复按键可循环轮换其余暂存。快捷键只在消息输入框内生效；使用单个可打印字符会占用该字符原本的输入行为。
+打开“设置 → 内置插件 → Prompt Stash → 输入暂存”，点击快捷键输入框后直接按下一个按键或组合键，再保存即可立即生效。默认快捷键为 `Ctrl+S`，也可以配置为 `F8` 等单键。输入非空时快捷键执行暂存，输入为空时恢复最新一条；进入恢复状态后，重复按键可循环轮换其余暂存。快捷键只在消息输入框内生效；使用单个可打印字符会占用该字符原本的输入行为。
 
 ## 数据与安全边界
 
 - 存储键：`dsh.promptStash.v1`
-- 设置命名空间：`dsh-prompt-stash`（DSH Host `settings.yaml`）
+- 设置命名空间：`prompt-stash`（profile 的 `cordis.patch.yml`）
 - 暂存范围：当前浏览器、按 `sessionId` 隔离
 - 内容：文本、ID、创建与更新时间、结构版本
 - 不存储：图片二进制、附件正文、文件内容、凭据或环境信息

@@ -1,8 +1,8 @@
-import type { SettingsScope } from "@deepseek-ai/dsh-client-runtime/client";
+import type { ConfigForm } from "@deepseek-ai/dsh-client-ui-settings/client";
 import { DEFAULT_STASH_SHORTCUT, normalizeShortcut } from "./client/shortcut";
 
 /** Stable Host settings namespace owned by prompt stash. */
-export const PROMPT_STASH_SETTINGS_NAMESPACE = "dsh-prompt-stash";
+export const PROMPT_STASH_SETTINGS_NAMESPACE = "prompt-stash";
 export const PROMPT_STASH_SHORTCUT_FIELD = "shortcut";
 export const LEGACY_SHORTCUT_STORAGE_KEY = "dsh.promptStash.settings.v1";
 
@@ -59,7 +59,7 @@ function hasHostShortcutOverride(user: unknown): boolean {
  * needed. Stashed prompt content remains browser-local under its separate key.
  */
 export async function migrateLegacyShortcut(
-  scope: SettingsScope<PromptStashSettings>,
+  scope: ConfigForm<PromptStashSettings>,
   storage: Pick<Storage, "getItem" | "removeItem">,
 ): Promise<void> {
   const snapshot = scope.getSnapshot();
@@ -67,7 +67,7 @@ export async function migrateLegacyShortcut(
 
   const shortcut = legacyShortcut(storage);
   if (shortcut !== null && !hasHostShortcutOverride(snapshot.user)) {
-    await scope.set(PROMPT_STASH_SHORTCUT_FIELD, shortcut);
+    if (!(await scope.set(PROMPT_STASH_SHORTCUT_FIELD, shortcut))) return;
   }
   storage.removeItem(LEGACY_SHORTCUT_STORAGE_KEY);
 }

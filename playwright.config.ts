@@ -7,11 +7,10 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   use: {
-    baseURL: "http://127.0.0.1:3080",
-    launchOptions: {
-      executablePath:
-        "C:\\Users\\lenovo\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1228\\chrome-headless-shell-win64\\chrome-headless-shell.exe",
-    },
+    baseURL: process.env.DSH_TEST_URL ?? "http://127.0.0.1:3080",
+    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
+      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE }
+      : {},
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

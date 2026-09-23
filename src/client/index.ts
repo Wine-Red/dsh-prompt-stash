@@ -1,4 +1,6 @@
-import type { ClientContext } from "@deepseek-ai/dsh-client-runtime/client";
+import type {} from "@deepseek-ai/dsh-client-ui-renderer/client";
+import type {} from "@deepseek-ai/dsh-client-ui-session/client";
+import type { Context as ClientContext } from "@deepseek-ai/cordis";
 import type {
   PropsLocale,
   PropsRuntime,
@@ -15,7 +17,7 @@ import { PromptStashSettings } from "./PromptStashSettings";
 import { en, NS, zh } from "./locales";
 import { installStyles } from "./styles";
 import {
-  decodePromptStashSettings,
+  type PromptStashSettings as PromptStashSettingsValue,
   migrateLegacyShortcut,
   PROMPT_STASH_SETTINGS_NAMESPACE,
 } from "../settings";
@@ -24,19 +26,13 @@ export { PromptStashController } from "./controller";
 export * from "./model";
 export * from "./storage";
 
-export const inject = [
-  "slots",
-  "locale",
-  "connection",
-  "remote",
-  "settingsScope",
-];
+export const inject = ["slots", "locale", "configForms"];
 
 type InputLeftProps = PropsRuntime<"conversation.input.left"> &
   PropsLocale<typeof NS>;
 type InputDockProps = PropsRuntime<"conversation.input.dock"> &
   PropsLocale<typeof NS>;
-type SettingsProps = PropsRuntime<"settings.plugin.item"> &
+type SettingsProps = PropsRuntime<"settings.plugins.tab"> &
   PropsLocale<typeof NS>;
 
 type Cleanup = () => void;
@@ -107,10 +103,9 @@ function initialize(
   ctx: ClientContext,
   controller: PromptStashController,
 ): void {
-  const settingsScope = ctx.settingsScope.bind({
-    namespace: PROMPT_STASH_SETTINGS_NAMESPACE,
-    decode: decodePromptStashSettings,
-  });
+  const settingsScope = ctx.configForms.get<PromptStashSettingsValue>(
+    PROMPT_STASH_SETTINGS_NAMESPACE,
+  );
   const syncShortcut = (): void => {
     const shortcut = settingsScope.getSnapshot().value?.shortcut;
     if (shortcut !== undefined) controller.setShortcut(shortcut);
@@ -161,7 +156,13 @@ function initialize(
             locale: NS,
           },
           (props: InputLeftProps) =>
-            createElement(PromptStashButton, { ...props, controller }),
+            createElement(PromptStashButton, {
+              ...props,
+              input: props.useInput(
+                (state: import("./dsh-types").DshInputState) => state,
+              ),
+              controller,
+            }),
         ),
       ),
     ),
@@ -178,24 +179,29 @@ function initialize(
             locale: NS,
           },
           (props: InputDockProps) =>
-            createElement(PromptStashList, { ...props, controller }),
+            createElement(PromptStashList, {
+              ...props,
+              input: props.useInput(
+                (state: import("./dsh-types").DshInputState) => state,
+              ),
+              controller,
+            }),
         ),
       ),
     ),
   );
 
-  // rc6 dispatched this contribution by `id`; rc7+ dispatch the keyed slot by
-  // settings namespace. Both fields preserve one additive build across releases.
+  // The official plugin settings section owns the tab; configuration remains keyed by the Host entry id.
   const settingsSlotOptions = {
-    name: "settings.plugin.item",
-    key: PROMPT_STASH_SETTINGS_NAMESPACE,
+    name: "settings.plugins.tab",
+    label: () => "Prompt Stash",
     id: "prompt-stash",
     order: 30,
     locale: NS,
   } as const;
-  safeSlotInject(ctx, "settings.plugin.item", () =>
-    ctx.slots.inject("settings.plugin.item", () =>
-      safeContribution(ctx, "settings.plugin.item", () =>
+  safeSlotInject(ctx, "settings.plugins.tab", () =>
+    ctx.slots.inject("settings.plugins.tab", () =>
+      safeContribution(ctx, "settings.plugins.tab", () =>
         ctx.slots.register(settingsSlotOptions, (props: SettingsProps) =>
           createElement(PromptStashSettings, { ...props, settingsScope }),
         ),

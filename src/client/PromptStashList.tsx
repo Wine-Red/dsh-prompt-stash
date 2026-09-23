@@ -1,10 +1,10 @@
 import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import {
   Button,
-  IconArchiveOutline20,
-  IconChevronDownOutline14,
-  IconChevronUpOutline14,
-  IconTrashOutline16,
+  IconArchiveOutlineMedium,
+  IconChevronDownOutlineMedium,
+  IconChevronUpOutlineMedium,
+  IconTrashOutlineRegular,
   Modal,
 } from "@deepseek-ai/dsh-client-ui-primitives";
 import type { TranslateNS } from "@deepseek-ai/dsh-client-ui-slots";
@@ -102,7 +102,7 @@ export function PromptStashList({
             >
               <span className={styles.headingGroup}>
                 <span className={styles.headerLead} aria-hidden="true">
-                  <IconArchiveOutline20 size={14} />
+                  <IconArchiveOutlineMedium size={14} />
                 </span>
                 <span className={styles.title}>
                   {t(
@@ -113,9 +113,9 @@ export function PromptStashList({
               </span>
               <span className={styles.chevron} aria-hidden="true">
                 {expanded ? (
-                  <IconChevronDownOutline14 size={14} />
+                  <IconChevronDownOutlineMedium size={14} />
                 ) : (
-                  <IconChevronUpOutline14 size={14} />
+                  <IconChevronUpOutlineMedium size={14} />
                 )}
               </span>
             </button>
@@ -162,7 +162,7 @@ export function PromptStashList({
                     aria-label={`${t("action.delete")}: ${entry.text}`}
                     onClick={() => controller.delete(sessionId, entry.id)}
                   >
-                    <IconTrashOutline16 size={14} />
+                    <IconTrashOutlineRegular size={14} />
                   </Button>
                 </li>
               ))}

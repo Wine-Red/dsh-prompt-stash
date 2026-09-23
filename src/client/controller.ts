@@ -136,7 +136,7 @@ export class PromptStashController {
 
     const composerIsEmpty =
       input.draft.length === 0 &&
-      input.imageIds.length === 0 &&
+      input.attachmentIds.length === 0 &&
       input.occurrences.length === 0;
     if (!composerIsEmpty || input.phase !== "plain") return false;
 
@@ -153,7 +153,7 @@ export class PromptStashController {
   ): boolean {
     if (
       input.draft.length > 0 ||
-      input.imageIds.length > 0 ||
+      input.attachmentIds.length > 0 ||
       input.occurrences.length > 0
     )
       return false;

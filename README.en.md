@@ -1,5 +1,7 @@
 ![dsh-prompt-stash — Save the thought. Ask the detour.](docs/assets/dsh-prompt-stash-cover.jpg)
 
+> Source compatibility update: 0.3.0 targets DSH 0.1.7-rc.1. Uses official Config/configForms and composer hooks. Shortcuts persist in profile configuration; stashes retain their existing localStorage key. Attachments and reference chips block plain-text stashing. Keep 0.2.x for older DSH versions.
+
 # dsh-prompt-stash
 
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
@@ -22,7 +24,7 @@ A local prompt-stash plugin for DeepSeek Harness Web. Push unsent plain-text inp
 - Clears and restores input through the official DSH `inputActions.setDraft()` API without manipulating the `textarea` or internal stores.
 - Stashed content stays in the current browser's `localStorage`; the shortcut is stored through DSH Host settings and survives reloads and browser changes.
 - Supports Chinese and English, light and dark themes, keyboard navigation, and a layout that integrates with DSH's native queued-message panel.
-- Records a single-key or key-combination shortcut under **Settings → Plugins → Plugin configuration**; the default is `Ctrl+S`.
+- Records a single-key or key-combination shortcut under **Settings → Built-in plugins → Prompt Stash**; the default is `Ctrl+S`.
 
 The current version supports plain text only. Input containing images, attachments, or file references cannot be stashed.
 
@@ -34,13 +36,15 @@ Stashed prompts are collapsed by default. Expand the panel to see the creation t
 
 ## Requirements
 
-- DeepSeek Harness `0.1.0-rc.6`, `0.1.0-rc.7`, or `0.1.0-rc.8`
+- DeepSeek Harness `0.1.7-rc.1`
 - A Web profile
 - Node.js 20 or later (source development only)
 
 Host, settings, style, and slot registration are fail-open boundaries. A conflicting mount disables and logs only that feature instead of propagating the exception into DSH startup.
 
 ## Installation
+
+> This compatibility update is available in GitHub source. npm and GitHub Release versions may differ. Build from source using the instructions below, or verify that a downloaded package matches the version documented here.
 
 ### npm registry (recommended)
 
@@ -60,10 +64,10 @@ dsh plugin --profile web update dsh-prompt-stash
 
 ### GitHub Release tarball (fallback)
 
-Download `dsh-prompt-stash-0.2.5.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
+Download `dsh-prompt-stash-0.3.0.tgz` from [Releases](https://github.com/Wine-Red/dsh-prompt-stash/releases/latest), then install it into the Web profile:
 
 ```sh
-dsh plugin --profile web add ./dsh-prompt-stash-0.2.5.tgz
+dsh plugin --profile web add ./dsh-prompt-stash-0.3.0.tgz
 ```
 
 The tarball also contains prebuilt artifacts. Restart DSH Web after installation.
@@ -108,12 +112,12 @@ Press the shortcut while the message composer is empty to restore and pop the la
 
 ### Configure the shortcut
 
-Open **Settings → Plugins → Plugin configuration → Prompt stash**, focus the shortcut field, press one key or a key combination, and save. Changes take effect immediately. The default is `Ctrl+S`; a single key such as `F8` is also supported. The shortcut stashes non-empty input and restores the latest stash when the composer is empty; once restored, repeated presses rotate through the remaining stashes. It only runs in the message composer. A printable single-key shortcut consumes that character's normal typing behavior.
+Open **Settings → Built-in plugins → Prompt Stash → Prompt stash**, focus the shortcut field, press one key or a key combination, and save. Changes take effect immediately. The default is `Ctrl+S`; a single key such as `F8` is also supported. The shortcut stashes non-empty input and restores the latest stash when the composer is empty; once restored, repeated presses rotate through the remaining stashes. It only runs in the message composer. A printable single-key shortcut consumes that character's normal typing behavior.
 
 ## Data and security boundaries
 
 - Storage key: `dsh.promptStash.v1`
-- Settings namespace: `dsh-prompt-stash` in DSH Host `settings.yaml`
+- Settings namespace: `prompt-stash` in the profile `cordis.patch.yml`
 - Stash scope: the current browser, isolated by `sessionId`
 - Stored data: text, ID, creation and update timestamps, and schema version
 - Not stored: image data, attachment contents, file contents, credentials, or environment information
