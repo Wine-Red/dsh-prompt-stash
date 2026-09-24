@@ -148,3 +148,7 @@ See the [official DeepSeek Harness documentation](https://deepseek-harness.githu
 ## License
 
 [MIT](LICENSE)
+
+### Desktop compatibility fix (2026-09-25)
+
+Supports DSH `0.1.7-rc.1` and `0.1.7-rc.2`. Host packages are optional peers, not production dependencies, preventing stale core packages from being installed into the profile. Restart DSH after upgrading. Future host versions require compatibility validation.

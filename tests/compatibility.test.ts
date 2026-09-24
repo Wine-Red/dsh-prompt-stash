@@ -10,7 +10,10 @@ describe("release compatibility", () => {
   test("declares rc7.1 and only additive slots", () => {
     const compatibility = JSON.parse(read("compatibility.json"));
     const patch = read("cordis.patch.yml");
-    expect(compatibility.supportedDshVersions).toEqual(["0.1.7-rc.1"]);
+    expect(compatibility.supportedDshVersions).toEqual([
+      "0.1.7-rc.1",
+      "0.1.7-rc.2",
+    ]);
     expect(compatibility.adapter.mode).toBe("additive-public-slots");
     expect(patch).not.toContain("disabled: true");
   });

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "supportedDshVersions": ["0.1.7-rc.1"],
+  "supportedDshVersions": ["0.1.7-rc.1", "0.1.7-rc.2"],
   "adapter": {
     "mode": "additive-public-slots",
     "slots": [
